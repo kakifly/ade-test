@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { addDays, toDateString } from '../../src/core/dates.ts';
+import { addDays, isWithinServerWindow, toDateString } from '../../src/core/dates.ts';
 
 describe('toDateString', () => {
   test('ローカル日付をYYYY-MM-DDにする', () => {
@@ -16,5 +16,23 @@ describe('addDays', () => {
   });
   test('年をまたぐ', () => {
     expect(addDays('2023-12-31', 1)).toBe('2024-01-01');
+  });
+});
+
+describe('isWithinServerWindow', () => {
+  const now = new Date('2024-03-10T12:00:00Z');
+  test('UTC日付の前日・当日・翌日は許可', () => {
+    expect(isWithinServerWindow('2024-03-09', now)).toBe(true);
+    expect(isWithinServerWindow('2024-03-10', now)).toBe(true);
+    expect(isWithinServerWindow('2024-03-11', now)).toBe(true);
+  });
+  test('前々日と翌々日は不許可', () => {
+    expect(isWithinServerWindow('2024-03-08', now)).toBe(false);
+    expect(isWithinServerWindow('2024-03-12', now)).toBe(false);
+  });
+  test('UTCの日付境界でも判定が崩れない', () => {
+    const edge = new Date('2024-03-10T23:59:59Z');
+    expect(isWithinServerWindow('2024-03-11', edge)).toBe(true);
+    expect(isWithinServerWindow('2024-03-12', edge)).toBe(false);
   });
 });

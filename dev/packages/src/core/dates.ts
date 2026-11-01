@@ -11,3 +11,10 @@ export function addDays(dateStr: string, n: number): string {
   // ローカルのコンストラクタで計算し、月またぎ・年またぎ・うるう日をDateに任せる
   return toDateString(new Date(y, m - 1, d + n));
 }
+
+/** 日付がサーバーのUTC日付の前後1日以内（3日間）かを返す */
+export function isWithinServerWindow(date: string, serverNow: Date): boolean {
+  // タイムゾーン差を許容する範囲。日付文字列の大小比較は YYYY-MM-DD ならそのまま正しい
+  const utcToday = serverNow.toISOString().slice(0, 10);
+  return date >= addDays(utcToday, -1) && date <= addDays(utcToday, 1);
+}
