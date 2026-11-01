@@ -2,13 +2,18 @@
   "name": "habit-tracker",
   "private": true,
   "type": "module",
-  "workspaces": ["src/packages/*", "src/apps/*"],
+  "workspaces": [
+    "src/packages/*",
+    "src/apps/*"
+  ],
   "scripts": {
-    "typecheck": "bun run --filter '*' typecheck",
-    "test": "bun test"
+    "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p src/scripts",
+    "test": "bun test",
+    "docs:basic-design": "bun src/scripts/docs/gen-basic-design.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
+    "exceljs": "^4.4.0",
     "typescript": "^7.0.2"
   }
 }
