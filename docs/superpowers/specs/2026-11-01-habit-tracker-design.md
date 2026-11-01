@@ -80,7 +80,7 @@
 
 - **方針ルール**: CLAUDE.mdに書く方針は、ユーザーのスキル `coding-guidelines` の3点（冪等性の確保、条件分岐へのコメント付与、ロジック・特にvalidationの共通化）
 - **壊れたデータ**: APIのレスポンスはzodで検証してからUIに渡す。検証に失敗したらエラー表示にする
-- **hook**: Claude Codeのhook（PostToolUse）として `.claude/settings.json` に設定。gitのhook（コミット前の検証）も併用する。後から追加した（ユーザー指示）
+- **hook**: Claude Codeのhook（PostToolUse）として `.claude/settings.json` に設定。gitのhook（huskyによるコミット前の型チェックと単体テスト）も併用する。後から追加した（ユーザー指示）
 - **DDLの管理**: SQLファイルを `dev/apps/src/api/db/ddl/` に連番で置き、それをDBに適用してから `drizzle-kit pull` でTypeScriptのスキーマを生成する。マイグレーション管理ツールは使わない
 - **Bunのバージョン**: asdfに入っているBun 1.4.2を `.tool-versions` で固定する
 - **NestJSの実行**: NestJSはBunで実行する。デコレータのメタデータなどで問題が出た場合は、ビルドをtscに切り替えることを検討する（Bun上での動作は最初のタスクで検証する）
