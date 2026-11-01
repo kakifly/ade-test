@@ -1,8 +1,11 @@
 name: CI
 
 on:
-  push:
+  # PRのたびに実行する（マージ前の検証。ブランチ保護で必須にする）
   pull_request:
+  # マージ後のmainでも実行する
+  push:
+    branches: [main]
 
 jobs:
   test:

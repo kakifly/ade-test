@@ -39,8 +39,8 @@ dev/
 - **hook**: 設定は `.claude/settings.json`、hookが呼ぶスクリプトは `.claude/hooks/` に置く（`dev/scripts` には置かない）
   - `hook-check.sh`（PostToolUse）: Edit・Write・MultiEdit のあとに、型チェックと単体テストを実行する
   - `stop-check.sh`（Stop）: 作業を終える直前に、型チェック、テストDBの初期化、すべてのテストを実行する。シェルのコマンドで変更したファイルも検証できる。失敗すると終了コード2で、Claudeは作業を続けて直す。直前にこのhookで止めた後の再実行では止めない（無限ループの防止）
-- **CI**: `.github/workflows/ci.yml`。push と pull request のたびに、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は「タスク完了の条件」と同じ
-- **構成を変えるとき**: 先にこの節を直す。`SPEC.md`、`docs/ai-input/`、`package.json`（workspaces）、各 `tsconfig.json` も合わせて直す
+- **コミット前の検証**: `.githooks/pre-commit`（gitのhook）が、コミットの直前に `bun run verify`（型チェック、テストDBの初期化、すべてのテスト）を実行する。失敗するとコミットは作られない。`bun install` が `git config core.hooksPath .githooks` を設定する（`prepare` スクリプト）。`--no-verify` で飛ばさない
+- **CI**: `.github/workflows/ci.yml`。pull request のたびと、`main` へのpush（マージ後）に、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は `bun run verify` と同じ。マージ前に成功を必須にするには、GitHubのブランチ保護（Require status checks）で `CI / test` を指定する
 
 ## 資料の置き場所
 
@@ -97,6 +97,7 @@ dev/
 - 完了の前に、次を実行して結果を確認する。1つでも失敗があれば、そのタスクは未完了とする
   1. `bun run typecheck`（型チェック）
   2. `bun run db:apply:test` のあと `bun test`（単体テストと結合テストのすべて）
+   - 1と2は、`bun run verify` でまとめて実行できる
 - 失敗したテストは、タスクと無関係に見えても、完了報告に名前を書く。テストを削除・スキップして通すことはしない
 - 失敗の原因が自分の変更でないとき（他のタスクの作業途中など）は、その旨を報告し、直るまで完了にしない
 - 完了の記録は、`task-done` でテストの実行結果を台帳に残してから行う
@@ -113,4 +114,4 @@ dev/
 - ドキュメント、コミットメッセージ、PR本文は日本語。識別子とブランチ名は英語
 - DBの接続情報は環境変数 `DATABASE_URL` で受け取る。`.env` はコミットしない。パスワードをログや出力、ドキュメントに書かない
 - 開発用は `habit_app_dev`、テスト用は `habit_app_test` を使う。`habit_app` には触れない
-- コミットは、テストが通る状態で小さく行う
+- コミットは、テストが通る状態で小さく行う（コミット前の検証で強制される）

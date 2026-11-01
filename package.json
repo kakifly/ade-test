@@ -13,7 +13,9 @@
     "test:unit": "bun test --path-ignore-patterns '**/*.int.test.ts'",
     "test:int": "bun test '.int.test.ts'",
     "db:apply": "bash dev/scripts/src/db-apply.sh",
-    "db:apply:test": "bash dev/scripts/src/db-apply.sh test"
+    "db:apply:test": "bash dev/scripts/src/db-apply.sh test",
+    "verify": "bun run typecheck && bun run db:apply:test && bun test",
+    "prepare": "git config core.hooksPath .githooks"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",

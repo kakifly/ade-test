@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# コミット前の検証。CIと同じ内容（型チェック、テストDBの初期化、すべてのテスト）を実行する。
+# 失敗したらコミットは作られない。--no-verify で飛ばさない（CLAUDE.md の規約）。
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+out=$(mktemp)
+trap 'rm -f "$out"' EXIT
+
+if ! bun run verify >"$out" 2>&1; then
+  echo "コミット前の検証に失敗しました。直してからコミットしてください。末尾:" >&2
+  tail -n 30 "$out" >&2
+  exit 1
+fi

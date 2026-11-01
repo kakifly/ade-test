@@ -18,7 +18,7 @@ out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
 # CLAUDE.md の「タスク完了の条件」と同じ内容: 型チェック → テストDBの初期化 → すべてのテスト
-if ! { bun run typecheck && bun run db:apply:test && bun test; } >"$out" 2>&1; then
+if ! { bun run verify; } >"$out" 2>&1; then
   echo "完了前の検証に失敗しました（typecheck または db:apply:test または bun test）。直してから終えてください。末尾:" >&2
   tail -n 30 "$out" >&2
   exit 2
