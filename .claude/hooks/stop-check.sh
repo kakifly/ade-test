@@ -10,7 +10,7 @@ if grep -q '"stop_hook_active"[[:space:]]*:[[:space:]]*true' <(cat); then
 fi
 
 # コードに変更がなければ、検証しない（会話だけのターンで毎回動かさない）
-if [ -z "$(git status --porcelain -- dev package.json bun.lock 2>/dev/null)" ]; then
+if [ -z "$(git status --porcelain -- dev package.json pnpm-lock.yaml 2>/dev/null)" ]; then
   exit 0
 fi
 

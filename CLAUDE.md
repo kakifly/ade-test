@@ -56,7 +56,8 @@ dev/
 
 ## 技術構成
 
-- TypeScript、Bun（ワークスペースのモノレポ。バンドルはBun、テストは `bun test`）
+- TypeScript、Bun（実行、バンドル、テスト `bun test`）、pnpm（パッケージ管理。ワークスペースのモノレポ。定義は `pnpm-workspace.yaml`、ロックファイルは `pnpm-lock.yaml`）
+- 依存の追加は `pnpm add`（`bun add` / `bun install` は使わない）。`workspace:*` でパッケージ間を参照する
 - `dev/apps/src/web`: React + React Hook Form
 - `dev/apps/src/api`: NestJS + Drizzle ORM + PostgreSQL
 - `dev/packages/src/schemas`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る

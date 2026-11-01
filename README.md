@@ -6,14 +6,14 @@
 
 ## 技術構成
 
-TypeScript、Bun（ワークスペースのモノレポ）、React + React Hook Form、zod、NestJS、PostgreSQL、Drizzle ORM
+TypeScript、Bun（実行・バンドル・テスト）、pnpm（パッケージ管理。ワークスペースのモノレポ）、React + React Hook Form、zod、NestJS、PostgreSQL、Drizzle ORM
 
 ## セットアップ
 
-前提: Bun 1.4.2（`.tool-versions` で固定）、PostgreSQL（開発用とテスト用に別のデータベース）、`psql`
+前提: Bun 1.4.2 と pnpm 10.6.1（`.tool-versions` で固定）、PostgreSQL（開発用とテスト用に別のデータベース）、`psql`
 
 ```bash
-bun install
+pnpm install
 cp dev/apps/src/api/.env.example dev/apps/src/api/.env   # 接続情報を書く（コミットしない）
 bun run db:apply                                          # 開発用DBにDDLを適用
 ```

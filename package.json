@@ -2,12 +2,8 @@
   "name": "habit-tracker",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "dev/packages/src/*",
-    "dev/apps/src/*"
-  ],
   "scripts": {
-    "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p dev/scripts",
+    "typecheck": "pnpm -r typecheck && tsc --noEmit -p dev/scripts",
     "test": "bun test",
     "docs:basic-design": "bun dev/scripts/src/generate-docs/gen-basic-design.ts",
     "docs:table-spec": "bun dev/scripts/src/generate-docs/gen-table-spec.ts",
@@ -20,9 +16,9 @@
     "verify": "bun run typecheck && bun run db:apply:test && bun test",
     "prepare": "husky",
     "e2e": "node dev/scripts/src/e2e/accept.mjs",
-    "start:api": "bun run --cwd dev/apps/src/api start",
-    "build:web": "bun run --cwd dev/apps/src/web build",
-    "start:web": "bun run --cwd dev/apps/src/web start"
+    "start:api": "pnpm --filter @habit/api start",
+    "build:web": "pnpm --filter @habit/web build",
+    "start:web": "pnpm --filter @habit/web start"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
@@ -31,5 +27,6 @@
     "husky": "^9.1.7",
     "playwright-core": "^1.64.1",
     "typescript": "^7.0.2"
-  }
+  },
+  "packageManager": "pnpm@10.6.1"
 }
