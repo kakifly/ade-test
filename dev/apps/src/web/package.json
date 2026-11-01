@@ -6,7 +6,9 @@
     ".": "./index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p ."
+    "typecheck": "tsc --noEmit -p .",
+    "build": "bun build ./index.html --outdir ./dist",
+    "start": "bun serve.ts"
   },
   "dependencies": {
     "@habit/core": "workspace:*",

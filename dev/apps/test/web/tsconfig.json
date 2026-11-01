@@ -1,0 +1,15 @@
+{
+  "extends": "../../../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "paths": {
+      "react": ["../../src/web/node_modules/react"],
+      "react/*": ["../../src/web/node_modules/react/*"],
+      "react-dom": ["../../src/web/node_modules/react-dom"],
+      "react-dom/*": ["../../src/web/node_modules/react-dom/*"],
+      "@testing-library/*": ["../../src/web/node_modules/@testing-library/*"],
+      "happy-dom": ["../../src/web/node_modules/happy-dom"],
+      "@habit/*": ["../../src/web/node_modules/@habit/*"]
+    }
+  }
+}
