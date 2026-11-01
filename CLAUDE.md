@@ -11,11 +11,12 @@
 
 ## ディレクトリ構成
 
-ルート直下は `docs/`（文書）と `dev/`（コード）の2つ。ルートに置くのは、ツールが要求する設定（`package.json`、`tsconfig.base.json`、`.tool-versions`、`.gitignore`）と、AIの入口になる文書（`CLAUDE.md`、`SPEC.md`、`TASK.md`、`DESIGN.md`）だけ。
+ルート直下は `docs/`（文書）と `dev/`（コード）の2つ。ルートに置くのは、ツールが要求する設定（`package.json`、`tsconfig.base.json`、`.tool-versions`、`.gitignore`）と、AIの入口になる文書（`CLAUDE.md`、`SPEC.md`、`TASK.md`、`DESIGN.md`）、Claude Codeの設定（`.claude/`）、CI（`.github/`）だけ。
 
 ```
 docs/                          文書（下の「資料の置き場所」を参照）
 .claude/                       Claude Code の設定（settings.json）とhookスクリプト（hooks/）
+.github/workflows/             CI（ci.yml）
 dev/
   apps/
     src/{api,web}/             アプリのソース。各フォルダがワークスペース（package.json、tsconfig.json を含む）
@@ -36,6 +37,9 @@ dev/
 - **ワークスペース**: `dev/apps/src/*` と `dev/packages/src/*` が対象。テスト用の `test/` にはパッケージ定義を置かない
 - **DDLと設定**: `dev/apps/src/api/db/ddl/`（DDL）と `dev/apps/src/api/.env`（接続情報。コミットしない）は、api のフォルダに置く
 - **hook**: 設定は `.claude/settings.json`、hookが呼ぶスクリプトは `.claude/hooks/` に置く（`dev/scripts` には置かない）
+  - `hook-check.sh`（PostToolUse）: Edit・Write・MultiEdit のあとに、型チェックと単体テストを実行する
+  - `stop-check.sh`（Stop）: 作業を終える直前に、型チェック、テストDBの初期化、すべてのテストを実行する。シェルのコマンドで変更したファイルも検証できる。失敗すると終了コード2で、Claudeは作業を続けて直す。直前にこのhookで止めた後の再実行では止めない（無限ループの防止）
+- **CI**: `.github/workflows/ci.yml`。push と pull request のたびに、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は「タスク完了の条件」と同じ
 - **構成を変えるとき**: 先にこの節を直す。`SPEC.md`、`docs/ai-input/`、`package.json`（workspaces）、各 `tsconfig.json` も合わせて直す
 
 ## 資料の置き場所
@@ -96,6 +100,13 @@ dev/
 - 失敗したテストは、タスクと無関係に見えても、完了報告に名前を書く。テストを削除・スキップして通すことはしない
 - 失敗の原因が自分の変更でないとき（他のタスクの作業途中など）は、その旨を報告し、直るまで完了にしない
 - 完了の記録は、`task-done` でテストの実行結果を台帳に残してから行う
+
+## 失敗が続くときの歯止め（ループの終了条件）
+
+- 同じテストが**3回続けて**失敗したら、同じ直し方を続けない。失敗の内容と、これまで試したことを書き出し、原因を調べ直す（`superpowers:systematic-debugging`）
+- 調べ直しても直らないときは、作業を止めて、ユーザーに報告する。報告には、失敗しているテスト名、期待値と実際の値、試したことを含める
+- テストを書き換えて通す・削除する・スキップする・期待値を実装に合わせる、のは直し方として認めない。仕様（`docs/ai-input/`）が誤っているときは、仕様を先に直す
+- 1回の直しで変えるのは1点だけにする。何が効いたかを分かるようにする
 
 ## 規約
 
