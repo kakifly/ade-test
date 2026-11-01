@@ -15,8 +15,8 @@
 
 - `dev/apps/{api,web}`: アプリ本体
 - `dev/packages/{core,schemas}`: 共有ライブラリ
-- `dev/scripts`: hook、DB適用、Excel・Word生成（ソースは `dev/scripts/src/`）
-- 各パッケージのソースは、その直下の `src/` に置く。単体テスト（`*.test.ts`）は、対象のソースと同じ `src/` 内の同じ階層に置く（例: `src/dates.ts` と `src/dates.test.ts`）。DBやHTTPを使う結合テストは `*.int.test.ts` とする
+- `dev/scripts`: hook、DB適用、Excel・Word生成（ソースは `dev/scripts/src/`、テストは `dev/scripts/test/`）
+- 各パッケージのソースは直下の `src/`、テストは `src/` と同じ階層の `test/` に置く。`test/` の中は `src/` と同じ構成にする（例: `src/dates.ts` のテストは `test/dates.test.ts`）。単体テストは `*.test.ts`、DBやHTTPを使う結合テストは `*.int.test.ts`
 
 ## 資料の置き場所
 

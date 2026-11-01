@@ -58,7 +58,7 @@
 | `dev/packages/schemas/src/fields/*.ts`、`src/{habit,error}.ts` | 項目スキーマ、組み合わせスキーマ |
 | `dev/apps/api/db/ddl/*.sql`、`dev/apps/api/drizzle.config.ts`、`dev/apps/api/src/db/schema.ts` | DDL、生成されたDrizzleスキーマ |
 | `dev/apps/api/src/habits/*` | リポジトリ、サービス、コントローラ、エラー変換 |
-| `dev/apps/api/src/**/*.int.test.ts` | DB・HTTPの結合テスト |
+| `dev/apps/api/test/**/*.int.test.ts` | DB・HTTPの結合テスト |
 | `dev/apps/web/src/*` | トークン、API、フォーム、一覧、状態管理 |
 | `dev/scripts/src/{hook-check.sh,db-apply.sh,docs/*}` | hook、DB適用、Excel・Word出力 |
 | `.claude/settings.json` | 編集後の検証hook |
@@ -108,7 +108,7 @@
 ### Task 4: 【体験: ハーネス】テスト基盤・型チェック・hook
 
 **Files:**
-- Create: `dev/packages/core/src/dates.ts`、`dev/packages/core/src/dates.test.ts`、`dev/scripts/src/hook-check.sh`、`.claude/settings.json`
+- Create: `dev/packages/core/src/dates.ts`、`dev/packages/core/test/dates.test.ts`、`dev/scripts/src/hook-check.sh`、`.claude/settings.json`
 - Modify: ルート `package.json`（`typecheck`、`test:unit`）
 
 **Interfaces:**
@@ -126,8 +126,8 @@
 ### Task 5（P1）: 【体験: ループ】ストリーク計算
 
 **Files:**
-- Create: `dev/packages/core/src/streak.ts`、`dev/packages/core/src/streak.test.ts`
-- Modify: `dev/packages/core/src/dates.ts`（`isWithinServerWindow` を追加）、`dev/packages/core/src/dates.test.ts`、`docs/experience-log.md`（第4章）
+- Create: `dev/packages/core/src/streak.ts`、`dev/packages/core/test/streak.test.ts`
+- Modify: `dev/packages/core/src/dates.ts`（`isWithinServerWindow` を追加）、`dev/packages/core/test/dates.test.ts`、`docs/experience-log.md`（第4章）
 
 **Interfaces:**
 - Consumes: `addDays`
@@ -146,7 +146,7 @@
 ### Task 6（P1）: 項目スキーマと組み合わせスキーマ
 
 **Files:**
-- Create: `dev/packages/schemas/src/fields/{habitId,habitName,date,streak,rowVersion,createdAt}.ts`、`dev/packages/schemas/src/{habit,error,index}.ts`、`dev/packages/schemas/src/*.test.ts`
+- Create: `dev/packages/schemas/src/fields/{habitId,habitName,date,streak,rowVersion,createdAt}.ts`、`dev/packages/schemas/src/{habit,error,index}.ts`、`dev/packages/schemas/test/*.test.ts`
 
 **Interfaces:**
 - Produces（`@habit/schemas`。すべてzodスキーマと、`z.infer` の型）:
@@ -163,7 +163,7 @@
 ### Task 7（P1）: DDL・トリガ・Drizzleスキーマ
 
 **Files:**
-- Create: `dev/apps/api/db/ddl/001_init.sql`、`dev/scripts/src/db-apply.sh`、`dev/apps/api/drizzle.config.ts`、`dev/apps/api/src/db/schema.ts`（生成）、`dev/apps/api/src/db/client.ts`、`dev/apps/api/src/db/db.int.test.ts`
+- Create: `dev/apps/api/db/ddl/001_init.sql`、`dev/scripts/src/db-apply.sh`、`dev/apps/api/drizzle.config.ts`、`dev/apps/api/src/db/schema.ts`（生成）、`dev/apps/api/src/db/client.ts`、`dev/apps/api/test/db/db.int.test.ts`
 
 **Interfaces:**
 - Produces:
@@ -175,7 +175,7 @@
 - [ ] **Step 1: DBが使えるか確認する。** `psql` で `habit_app_test` に接続（パスワードを表示しない）
 - [ ] **Step 2: `001_init.sql` を書く。** 再実行しても壊れないよう、`CREATE TABLE IF NOT EXISTS`、`CREATE OR REPLACE FUNCTION`、トリガは `DROP TRIGGER IF EXISTS` してから作る。`habit_checks` のトリガは `BEFORE INSERT OR UPDATE`。条件分岐にコメントを付ける
 - [ ] **Step 3: 失敗する結合テストを書く（`db.int.test.ts`、`TEST_DATABASE_URL` を使用）。** 各テストの前にデータを消す。内容: INSERTで `row_version` が1／`set_config` した値が `txn_id` に入る／UPDATEで `row_version` が+1／UPDATEで `row_version = 99` を指定しても+1のまま／`set_config` 無しでも `txn_id` が空でない／古いバージョンのUPDATEが0行／**2つの接続で同じバージョンの更新を同時に実行し、片方だけが1行を更新、もう片方は0行**／習慣の削除でチェックが消える／同じ `(habit_id, check_date)` の `INSERT ... ON CONFLICT DO NOTHING` を2回行っても1行／同名の習慣が一意制約で拒否される
-- [ ] **Step 4: `bun run db:apply:test` のあと `bun test dev/apps/api/src/db/db.int.test.ts`。** Expected: DDL適用後に PASS（適用前は FAIL）
+- [ ] **Step 4: `bun run db:apply:test` のあと `bun test dev/apps/api/test/db/db.int.test.ts`。** Expected: DDL適用後に PASS（適用前は FAIL）
 - [ ] **Step 5: 開発用DBに `bun run db:apply` を実行し、`drizzle-kit pull` で `src/db/schema.ts` を生成する。** 生成物を確認し、列の型が上記の定義と一致することを確認する
 - [ ] **Step 6: Commit** `feat: DDLとトリガ、Drizzleスキーマを追加`
 
@@ -198,7 +198,7 @@
 ### Task 9（P2）: API（NestJS）
 
 **Files:**
-- Create: `dev/apps/api/src/{main.ts,app.module.ts}`、`dev/apps/api/src/habits/{habits.repository.ts,habits.service.ts,habits.controller.ts,habits.module.ts}`、`dev/apps/api/src/common/{zod-validation.pipe.ts,txn-context.interceptor.ts,error.filter.ts}`、`dev/apps/api/src/habits/{habits.service.test.ts,habits.api.int.test.ts}`
+- Create: `dev/apps/api/src/{main.ts,app.module.ts}`、`dev/apps/api/src/habits/{habits.repository.ts,habits.service.ts,habits.controller.ts,habits.module.ts}`、`dev/apps/api/src/common/{zod-validation.pipe.ts,txn-context.interceptor.ts,error.filter.ts}`、`dev/apps/api/test/habits/{habits.service.test.ts,habits.api.int.test.ts}`
 
 **Interfaces:**
 - Consumes: `calcStreak`、`isWithinServerWindow`（Task 5）、`@habit/schemas`（Task 6）、`createDb` とスキーマ（Task 7）
@@ -218,7 +218,7 @@
 ### Task 10（P2）: 画面（React）
 
 **Files:**
-- Create: `dev/apps/web/index.html`、`dev/apps/web/src/{main.tsx,App.tsx,tokens.css,api.ts,conflict.ts}`、`dev/apps/web/src/components/{HabitForm,HabitList,HabitRow,StreakChip}.tsx`、`dev/apps/web/serve.ts`、`dev/apps/web/src/*.test.ts(x)`、`dev/apps/web/bunfig.toml`
+- Create: `dev/apps/web/index.html`、`dev/apps/web/src/{main.tsx,App.tsx,tokens.css,api.ts,conflict.ts}`、`dev/apps/web/src/components/{HabitForm,HabitList,HabitRow,StreakChip}.tsx`、`dev/apps/web/serve.ts`、`dev/apps/web/test/*.test.ts(x)`、`dev/apps/web/bunfig.toml`
 
 **Interfaces:**
 - Consumes: `@habit/schemas`、`@habit/core`（`toDateString`）
