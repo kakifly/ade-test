@@ -1,0 +1,5 @@
+**/.env
+*:Zone.Identifier
+.env
+.superpowers/
+node_modules/
