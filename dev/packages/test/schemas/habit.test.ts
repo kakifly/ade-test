@@ -53,5 +53,7 @@ describe('その他の組み合わせスキーマ', () => {
   test('errorResponseSchema', () => {
     expect(errorResponseSchema.safeParse({ error: { code: 'VERSION_CONFLICT', message: 'x' } }).success).toBe(true)
     expect(errorResponseSchema.safeParse({ error: { code: 'OTHER', message: 'x' } }).success).toBe(false)
+    // 想定外のエラー（500）にも対応する
+    expect(errorResponseSchema.safeParse({ error: { code: 'INTERNAL_ERROR', message: 'x' } }).success).toBe(true)
   })
 })

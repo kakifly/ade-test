@@ -6,6 +6,7 @@ export const errorCodes = [
   'NOT_FOUND',
   'DATE_NOT_ALLOWED',
   'VERSION_CONFLICT',
+  'INTERNAL_ERROR',
 ] as const
 
 export const errorCodeField = z.enum(errorCodes, { error: 'エラーコードが正しくありません' })
