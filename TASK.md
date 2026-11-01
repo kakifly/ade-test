@@ -6,23 +6,22 @@
 
 ## 完了
 
-- [x] 設計書（`docs/superpowers/specs/2026-11-01-habit-tracker-design.md`）
-- [x] 技術構成の決定（Bun／TypeScript／React Hook Form／zod／NestJS／PostgreSQL／Drizzle）
-- [x] 開発用・テスト用DBの作成（`habit_app_dev`、`habit_app_test`）
-- [x] 要件定義書（`docs/deliverables/要件定義書.docx`）
-- [x] ドキュメントのフォルダ構成、`CLAUDE.md`、`SPEC.md`、`TASK.md`
+- [x] 設計書、技術構成の決定、開発用・テスト用DBの作成、ドキュメントの構成（`CLAUDE.md`、`SPEC.md`、`TASK.md`）
+- [x] 要件定義書（docx）、基本設計書（xlsx）、テーブル仕様書（xlsx）の生成
+- [x] 実装計画 Task 1〜11（モノレポ、日付・ストリーク、zodスキーマ、DDLとトリガ、NestJS API、React画面、受入確認）
+- [x] 4つの体験の記録（`docs/experience-log.md`）
+- [x] ループの仕組み（hook、husky、CI、`/fix-loop`、`/verify-ui`。`docs/loop-engineering.md`）
 
 ## 次にやること
 
-- [x] `docs/ai-input/requirements.md` と `basic-design.md` の作成（要判断3点は確定。ほかの[案]は未承認）
-- [x] 同時実行制御（row_version＋トリガ、txn_id）を要件・基本設計・CLAUDE.mdに反映（設計A）
-- [ ] 実装計画の書き直し（モノレポ、Drizzle、NestJS 向け）とユーザーの確認
-- [ ] 実装（計画のタスク順）
-- [ ] 基本設計書.xlsx と テーブル仕様書.xlsx の生成スクリプトと出力
-- [ ] 全体レビュー
+- [ ] 最終レビュー（ブランチ全体を新しい目で確認し、Critical/Important を1回の修正で直す）
+- [ ] 体験ログの「ユーザーの感想」（第3章・第4章・全体）の記入
+- [ ] ブランチの統合（`superpowers:finishing-a-development-branch`）
 
 ## 未決・注意
 
 - DBの接続情報は `dev/apps/src/api/.env`（`.gitignore` 済み）。ひな形は `.env.example`
-- 作業ブランチ: `feature/habit-tracker`。進捗の記録は実行用の台帳にもある（`.superpowers/`、git管理外）
-- 実装計画の進行: Task 1〜7 完了（プロンプト・コンテキスト・ハーネス・ループの体験を記録済み）。次は Task 8〜10（テーブル仕様書・要件定義書の再生成、NestJS API、React画面）
+- 作業ブランチ: `feature/habit-tracker`。実験ブランチ（`experiment/*`）は記録のために残す（マージしない）
+- CIはGitHub上で未実行。マージ前に必須にするには、GitHubのブランチ保護の設定が必要
+- 生成したExcel・Wordは、見た目を未確認（Wordの目次は開いて更新する）
+- 起動方法は `README.md`
