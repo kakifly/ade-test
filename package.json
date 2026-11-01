@@ -3,8 +3,8 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "dev/packages/*",
-    "dev/apps/*"
+    "dev/packages/src/*",
+    "dev/apps/src/*"
   ],
   "scripts": {
     "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p dev/scripts",

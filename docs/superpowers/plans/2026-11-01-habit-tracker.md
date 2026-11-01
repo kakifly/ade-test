@@ -6,7 +6,7 @@
 
 **Goal:** 習慣の登録・日次チェック・連続達成日数表示ができるWebアプリ（Bunモノレポ、React／NestJS／PostgreSQL／Drizzle）を作り、過程で4つのエンジニアリングを体験して `docs/experience-log.md` に記録する。
 
-**Architecture:** 項目ごとのzodスキーマ（`dev/packages/schemas`）と純粋関数（`dev/packages/core`）を、画面（`dev/apps/web`）とAPI（`dev/apps/api`）が共有する。DBはDDL（SQL）を正本とし、`drizzle-kit pull` でスキーマを生成する。更新は行バージョン（`row_version`）による楽観的ロックで制御し、トリガが `row_version` と `txn_id` を更新する。
+**Architecture:** 項目ごとのzodスキーマ（`dev/packages/src/schemas`）と純粋関数（`dev/packages/src/core`）を、画面（`dev/apps/src/web`）とAPI（`dev/apps/src/api`）が共有する。DBはDDL（SQL）を正本とし、`drizzle-kit pull` でスキーマを生成する。更新は行バージョン（`row_version`）による楽観的ロックで制御し、トリガが `row_version` と `txn_id` を更新する。
 
 **Tech Stack:** TypeScript、Bun 1.4.2（ワークスペース、バンドラ、`bun test`）、React、React Hook Form、zod、NestJS、Drizzle ORM、drizzle-kit、PostgreSQL 14、exceljs（Excel出力）、Playwright MCP（画面確認）
 
@@ -43,8 +43,8 @@
 | 区分 | タスク | 前提 | 編集範囲（重ならない） |
 |---|---|---|---|
 | 直列 | 1 → 2 → 3 → 4 | 順に（2・3はユーザーの参加が必要） | 土台、実験ブランチ、ハーネス |
-| **P1** | 5、6、7 | Task 4 完了後 | `dev/packages/core`、`dev/packages/schemas`、`dev/apps/api/db`＋`src/db` |
-| **P2** | 8、9、10 | P1 完了後 | `dev/scripts/docs`＋`docs/deliverables`＋`docs/reference`、`dev/apps/api/src/habits`、`dev/apps/web` |
+| **P1** | 5、6、7 | Task 4 完了後 | `dev/packages/src/core`、`dev/packages/src/schemas`、`dev/apps/src/api/db`＋`src/db` |
+| **P2** | 8、9、10 | P1 完了後 | `dev/scripts/docs`＋`docs/deliverables`＋`docs/reference`、`dev/apps/src/api/habits`、`dev/apps/src/web` |
 | 直列 | 11 → 12 | P2 完了後 | 結合確認、仕上げ |
 
 各並行グループの終了時に、全体の `bun run typecheck && bun test` を実行してから次へ進む。
@@ -54,12 +54,12 @@
 | パス | 責務 |
 |---|---|
 | `package.json`、`tsconfig.base.json`、`.tool-versions`、`.env.example` | ワークスペース、共通設定 |
-| `dev/packages/core/src/{dates,streak}.ts` | 日付処理、ストリーク、許可範囲の判定 |
-| `dev/packages/schemas/src/fields/*.ts`、`src/{habit,error}.ts` | 項目スキーマ、組み合わせスキーマ |
-| `dev/apps/api/db/ddl/*.sql`、`dev/apps/api/drizzle.config.ts`、`dev/apps/api/src/db/schema.ts` | DDL、生成されたDrizzleスキーマ |
-| `dev/apps/api/src/habits/*` | リポジトリ、サービス、コントローラ、エラー変換 |
+| `dev/packages/src/core/{dates,streak}.ts` | 日付処理、ストリーク、許可範囲の判定 |
+| `dev/packages/src/schemas/fields/*.ts`、`src/{habit,error}.ts` | 項目スキーマ、組み合わせスキーマ |
+| `dev/apps/src/api/db/ddl/*.sql`、`dev/apps/src/api/drizzle.config.ts`、`dev/apps/src/api/db/schema.ts` | DDL、生成されたDrizzleスキーマ |
+| `dev/apps/src/api/habits/*` | リポジトリ、サービス、コントローラ、エラー変換 |
 | `dev/apps/test/api/**/*.int.test.ts` | DB・HTTPの結合テスト |
-| `dev/apps/web/src/*` | トークン、API、フォーム、一覧、状態管理 |
+| `dev/apps/src/web/*` | トークン、API、フォーム、一覧、状態管理 |
 | `dev/scripts/src/{hook-check.sh,db-apply.sh,generate-docs/*}` | hook、DB適用、Excel・Word出力 |
 | `.claude/settings.json` | 編集後の検証hook |
 | `docs/experience-log.md` | 4つの体験の記録 |
@@ -69,15 +69,15 @@
 ### Task 1: モノレポの土台と環境
 
 **Files:**
-- Create: `package.json`、`tsconfig.base.json`、`.tool-versions`、`.env.example`、`docs/experience-log.md`、各ワークスペースの `package.json` と `tsconfig.json`（`dev/packages/core`、`dev/packages/schemas`、`dev/apps/api`、`dev/apps/web`）
-- Modify: `.gitignore`（`dist/` を追加）、`dev/apps/api/.env`（作成。`src/.env` から移す）
+- Create: `package.json`、`tsconfig.base.json`、`.tool-versions`、`.env.example`、`docs/experience-log.md`、各ワークスペースの `package.json` と `tsconfig.json`（`dev/packages/src/core`、`dev/packages/src/schemas`、`dev/apps/src/api`、`dev/apps/src/web`）
+- Modify: `.gitignore`（`dist/` を追加）、`dev/apps/src/api/.env`（作成。`src/.env` から移す）
 
 **Interfaces:**
 - Produces: `bun run typecheck`、`bun test`、`bun run db:apply` が使えるルートスクリプトの枠。ワークスペース名は `@habit/core`、`@habit/schemas`、`@habit/api`、`@habit/web`。`docs/experience-log.md` に4つの章
 
 - [ ] **Step 1: `.tool-versions` に `bun 1.4.2` を書き、`bun --version` を実行。** Expected: `1.4.2`
 - [ ] **Step 2: ルート `package.json`（`workspaces: ["dev/packages/*","dev/apps/*"]`、`scripts.typecheck`、`scripts.test`）と各ワークスペースの枠を作る。** パッケージ間の依存は `workspace:*` で宣言する。`typescript` を devDependency に入れる
-- [ ] **Step 3: `src/.env`（host, db, user, password）から `dev/apps/api/.env` を作る。** `DATABASE_URL` と `TEST_DATABASE_URL` をURL形式で書く（パスワードは必要ならURLエンコード）。**値を画面に出さず、スクリプトで変換する。** 完了後 `src/.env` と空の `src/` を削除し、`.env.example`（値はダミー）を作る。`git status` に `.env` が出ないことを確認する
+- [ ] **Step 3: `src/.env`（host, db, user, password）から `dev/apps/src/api/.env` を作る。** `DATABASE_URL` と `TEST_DATABASE_URL` をURL形式で書く（パスワードは必要ならURLエンコード）。**値を画面に出さず、スクリプトで変換する。** 完了後 `src/.env` と空の `src/` を削除し、`.env.example`（値はダミー）を作る。`git status` に `.env` が出ないことを確認する
 - [ ] **Step 4: `docs/experience-log.md` に「1. プロンプト」「2. コンテキスト」「3. ハーネス」「4. ループ」の章と、各章の「やったこと／結果／気づき」の枠を作る**
 - [ ] **Step 5: `bun install` を実行。** Expected: 成功し、`bun run typecheck` が（ソースが無いため）エラーなく終わる
 - [ ] **Step 6: Commit** `chore: Bunモノレポの土台と環境設定を追加`
@@ -108,16 +108,16 @@
 ### Task 4: 【体験: ハーネス】テスト基盤・型チェック・hook
 
 **Files:**
-- Create: `dev/packages/core/src/dates.ts`、`dev/packages/core/test/dates.test.ts`、`dev/scripts/src/hook-check.sh`、`.claude/settings.json`
+- Create: `dev/packages/src/core/dates.ts`、`dev/packages/test/core/dates.test.ts`、`dev/scripts/src/hook-check.sh`、`.claude/settings.json`
 - Modify: ルート `package.json`（`typecheck`、`test:unit`）
 
 **Interfaces:**
 - Produces（`@habit/core`）: `toDateString(d: Date): string`（ローカル日付の `YYYY-MM-DD`）、`addDays(dateStr: string, n: number): string`（`n` は負も可）
 
 - [ ] **Step 1: 失敗するテストを書く。** `toDateString(new Date(2024, 0, 5)) === '2024-01-05'`、`addDays('2024-02-28', 1) === '2024-02-29'`、`addDays('2024-03-01', -1) === '2024-02-29'`、`addDays('2023-12-31', 1) === '2024-01-01'`
-- [ ] **Step 2: `bun test dev/packages/core` を実行。** Expected: FAIL（モジュール無し）
+- [ ] **Step 2: `bun test dev/packages/src/core` を実行。** Expected: FAIL（モジュール無し）
 - [ ] **Step 3: `dates.ts` を実装する。** UTCではなくローカル日付で計算する（`Date` のローカルコンストラクタ）
-- [ ] **Step 4: `bun test dev/packages/core`。** Expected: PASS
+- [ ] **Step 4: `bun test dev/packages/src/core`。** Expected: PASS
 - [ ] **Step 5: ルートに `test:unit`（結合テスト `*.int.test.ts` を含まない）と `typecheck`（各ワークスペースで `tsc --noEmit`）を整える。** 結合テストはファイル名で区別し、除外方法は実際に実行して確認する
 - [ ] **Step 6: `dev/scripts/src/hook-check.sh` を作る。** `typecheck` と `test:unit` を実行し、失敗時は結果の末尾を標準エラーに出して終了コード2で終わる。`.claude/settings.json` に `PostToolUse`（対象 `Edit|Write|MultiEdit`）で呼び出す設定を書く
 - [ ] **Step 7: hookの検証。** `dates.ts` をわざと壊して編集し、hookが失敗を報告することを確認してから元に戻す。第3章に、設定の内容と観察（報告の見え方、実行時間）を記録する
@@ -126,8 +126,8 @@
 ### Task 5（P1）: 【体験: ループ】ストリーク計算
 
 **Files:**
-- Create: `dev/packages/core/src/streak.ts`、`dev/packages/core/test/streak.test.ts`
-- Modify: `dev/packages/core/src/dates.ts`（`isWithinServerWindow` を追加）、`dev/packages/core/test/dates.test.ts`、`docs/experience-log.md`（第4章）
+- Create: `dev/packages/src/core/streak.ts`、`dev/packages/test/core/streak.test.ts`
+- Modify: `dev/packages/src/core/dates.ts`（`isWithinServerWindow` を追加）、`dev/packages/test/core/dates.test.ts`、`docs/experience-log.md`（第4章）
 
 **Interfaces:**
 - Consumes: `addDays`
@@ -137,16 +137,16 @@
 
 - [ ] **Step 1: 先に全テストを書く（失敗する状態）。** 空配列→0／今日のみ→1／今日未チェックで昨日・一昨日→2／1日空けて→0（空いた前の連続は数えない）／月またぎ（`2024-03-01` 基準で `2024-02-29`、`2024-02-28`）／年またぎ／うるう日／未来日付のみ→0／重複日付は1日／順不同の入力。`isWithinServerWindow` は、UTC日付の前日・当日・翌日が true、前々日・翌々日が false
 - [ ] **Step 2: ループ実験のため、わざと不完全な実装を作る。** 同じ月の中の日の差だけで判定し、月・年をまたぐ処理を持たせない
-- [ ] **Step 3: ループを回す。** `bun test dev/packages/core` → 失敗を読む → 1つだけ直す → 再実行、を全テストが通るまで繰り返す。周回ごとに「失敗したテスト／直した点」を第4章に記録する（hookが自動で回す様子も記録）
+- [ ] **Step 3: ループを回す。** `bun test dev/packages/src/core` → 失敗を読む → 1つだけ直す → 再実行、を全テストが通るまで繰り返す。周回ごとに「失敗したテスト／直した点」を第4章に記録する（hookが自動で回す様子も記録）
 - [ ] **Step 4: 最終的な実装は `addDays` で遡る形にする。** `checked` は `Set` にして重複と順序の影響を受けないようにする。条件分岐に日本語コメントを付ける
 - [ ] **Step 5: `isWithinServerWindow` を実装する。** UTC日付の比較は日付文字列で行う
-- [ ] **Step 6: `bun test dev/packages/core`。** Expected: すべて PASS
+- [ ] **Step 6: `bun test dev/packages/src/core`。** Expected: すべて PASS
 - [ ] **Step 7: Commit** `feat: ストリーク計算と許可範囲の判定を追加`
 
 ### Task 6（P1）: 項目スキーマと組み合わせスキーマ
 
 **Files:**
-- Create: `dev/packages/schemas/src/fields/{habitId,habitName,date,streak,rowVersion,createdAt}.ts`、`dev/packages/schemas/src/{habit,error,index}.ts`、`dev/packages/schemas/test/*.test.ts`
+- Create: `dev/packages/src/schemas/fields/{habitId,habitName,date,streak,rowVersion,createdAt}.ts`、`dev/packages/src/schemas/{habit,error,index}.ts`、`dev/packages/test/schemas/*.test.ts`
 
 **Interfaces:**
 - Produces（`@habit/schemas`。すべてzodスキーマと、`z.infer` の型）:
@@ -155,15 +155,15 @@
   - エラーメッセージは日本語
 
 - [ ] **Step 1: 失敗するテストを書く。** `habitNameField`: `''`・`'   '`・51文字を拒否、50文字を許可、`'  読書 '` を `'読書'` に正規化。`dateField`: `'2024-02-29'` 可、`'2023-02-29'`・`'2024-13-01'`・`'2024-1-1'` 不可。`rowVersionField`: 0・小数・負を拒否。`versionQuerySchema`: `{ rowVersion: '3' }` を `3` に変換。`createHabitFormSchema` が `habitNameField` を再利用していること（同じ入力で同じ結果）
-- [ ] **Step 2: `bun test dev/packages/schemas`。** Expected: FAIL
+- [ ] **Step 2: `bun test dev/packages/src/schemas`。** Expected: FAIL
 - [ ] **Step 3: 実装する。** 組み合わせスキーマは項目スキーマを参照して作り、規則を再記述しない
-- [ ] **Step 4: `bun test dev/packages/schemas`。** Expected: PASS
+- [ ] **Step 4: `bun test dev/packages/src/schemas`。** Expected: PASS
 - [ ] **Step 5: Commit** `feat: 項目ごとのzodスキーマと組み合わせスキーマを追加`
 
 ### Task 7（P1）: DDL・トリガ・Drizzleスキーマ
 
 **Files:**
-- Create: `dev/apps/api/db/ddl/001_init.sql`、`dev/scripts/src/db-apply.sh`、`dev/apps/api/drizzle.config.ts`、`dev/apps/api/src/db/schema.ts`（生成）、`dev/apps/api/src/db/client.ts`、`dev/apps/test/api/db/db.int.test.ts`
+- Create: `dev/apps/src/api/db/ddl/001_init.sql`、`dev/scripts/src/db-apply.sh`、`dev/apps/src/api/drizzle.config.ts`、`dev/apps/src/api/db/schema.ts`（生成）、`dev/apps/src/api/db/client.ts`、`dev/apps/test/api/db/db.int.test.ts`
 
 **Interfaces:**
 - Produces:
@@ -198,7 +198,7 @@
 ### Task 9（P2）: API（NestJS）
 
 **Files:**
-- Create: `dev/apps/api/src/{main.ts,app.module.ts}`、`dev/apps/api/src/habits/{habits.repository.ts,habits.service.ts,habits.controller.ts,habits.module.ts}`、`dev/apps/api/src/common/{zod-validation.pipe.ts,txn-context.interceptor.ts,error.filter.ts}`、`dev/apps/test/api/habits/{habits.service.test.ts,habits.api.int.test.ts}`
+- Create: `dev/apps/src/api/{main.ts,app.module.ts}`、`dev/apps/src/api/habits/{habits.repository.ts,habits.service.ts,habits.controller.ts,habits.module.ts}`、`dev/apps/src/api/common/{zod-validation.pipe.ts,txn-context.interceptor.ts,error.filter.ts}`、`dev/apps/test/api/habits/{habits.service.test.ts,habits.api.int.test.ts}`
 
 **Interfaces:**
 - Consumes: `calcStreak`、`isWithinServerWindow`（Task 5）、`@habit/schemas`（Task 6）、`createDb` とスキーマ（Task 7）
@@ -212,26 +212,26 @@
 - [ ] **Step 3: リポジトリとサービスを実装する。** `setCheck` は1トランザクションで、最初に `set_config('app.txn_id', ..., true)`、次に `UPDATE habits SET name = name WHERE id = ? AND row_version = ? RETURNING row_version`（0行なら存在確認して `not_found` か `conflict`）、続いて付与は `INSERT ... ON CONFLICT DO NOTHING`、解除は `DELETE`。`deleteVersioned` も同じ判定。SQLは必ずパラメータ化し、条件分岐にコメントを付ける
 - [ ] **Step 4: HTTPの結合テストを書く（`habits.api.int.test.ts`、`TEST_DATABASE_URL`、ランダムポートで起動）。** 作成→一覧に `rowVersion` が含まれる／空・51文字の名前が400／同名が409 `DUPLICATE_NAME`／前後空白つきの同名も409／チェック付与で200と新しい `rowVersion`／古い `rowVersion` で409 `VERSION_CONFLICT`／**同じ `rowVersion` で同時に2リクエスト→片方200・片方409**／存在しないIDが404／削除済み習慣へのチェックが404／同じチェックの再送は二重にならない／許可範囲外の日付が422／削除後にチェックも消える／`txn_id` が更新した全行で一致（A-11）
 - [ ] **Step 5: コントローラ、検証パイプ（`@habit/schemas` を使用）、リクエストごとにUUIDを発行する `TxnContextInterceptor`、エラー変換フィルタ（`errorResponseSchema` の形）を実装する**
-- [ ] **Step 6: `bun run typecheck && bun test dev/apps/api`。** Expected: すべて PASS（結合テストは `db:apply:test` 済みのDBに対して）
+- [ ] **Step 6: `bun run typecheck && bun test dev/apps/src/api`。** Expected: すべて PASS（結合テストは `db:apply:test` 済みのDBに対して）
 - [ ] **Step 7: Commit** `feat: 習慣APIと楽観的ロックを追加`
 
 ### Task 10（P2）: 画面（React）
 
 **Files:**
-- Create: `dev/apps/web/index.html`、`dev/apps/web/src/{main.tsx,App.tsx,tokens.css,api.ts,conflict.ts}`、`dev/apps/web/src/components/{HabitForm,HabitList,HabitRow,StreakChip}.tsx`、`dev/apps/web/serve.ts`、`dev/apps/test/web/*.test.ts(x)`、`dev/apps/web/bunfig.toml`
+- Create: `dev/apps/src/web/index.html`、`dev/apps/src/web/{main.tsx,App.tsx,tokens.css,api.ts,conflict.ts}`、`dev/apps/src/web/components/{HabitForm,HabitList,HabitRow,StreakChip}.tsx`、`dev/apps/src/web/serve.ts`、`dev/apps/test/web/*.test.ts(x)`、`dev/apps/src/web/bunfig.toml`
 
 **Interfaces:**
 - Consumes: `@habit/schemas`、`@habit/core`（`toDateString`）
 - Produces:
   - `createApiClient(fetchImpl: typeof fetch)`: `listHabits(today)`、`createHabit(name)`、`deleteHabit(id, rowVersion)`、`setCheck(id, date, checked, rowVersion)`。応答は `@habit/schemas` で検証し、形が違えばエラーにする
   - `resolveToggleConflict(desired: boolean, latest: HabitResponse, date: string): 'already' | 'retry'`
-  - `bun run --cwd dev/apps/web build`（Bunのバンドラで `dist/` を生成）、`serve.ts`（`dist/` を配信し `/api` をAPIへ転送）
+  - `bun run --cwd dev/apps/src/web build`（Bunのバンドラで `dist/` を生成）、`serve.ts`（`dist/` を配信し `/api` をAPIへ転送）
 
 - [ ] **Step 1: 失敗するテストを書く。** `resolveToggleConflict`: 望む状態にすでになっていれば `'already'`、なっていなければ `'retry'`。APIクライアント（偽の `fetch`）: 壊れたJSON・想定外の形・通信失敗でエラーを返す／409で `VERSION_CONFLICT` を識別する。コンポーネント（testing-library + happy-dom）: 空の名前で送信するとエラー文が欄の下に出る／`<script>alert(1)</script>` という習慣名が文字列として表示され、要素として挿入されない／通信中はチェックボックスが無効／習慣が無いときに案内が出る
-- [ ] **Step 2: `bun test dev/apps/web`。** Expected: FAIL
+- [ ] **Step 2: `bun test dev/apps/src/web`。** Expected: FAIL
 - [ ] **Step 3: `tokens.css` に `DESIGN.md` の値（色、フォント、余白、角丸、影、各部品）をCSS変数として定義する。** 各部品はトークンだけを参照し、値を直接書かない。フォントは Cinzel／Spectral を Google Fonts で読み込み、フォールバックは `serif`。純粋な黒・白を使わない
 - [ ] **Step 4: 実装する。** フォームは React Hook Form + `zodResolver(createHabitFormSchema)`。「今日」は操作のたびに `toDateString(new Date())` で求める。変更後は一覧を再取得する。バージョンは自分で増減せず、再取得した値を使う。409のときは再取得し、`resolveToggleConflict` が `'already'` なら成功扱い、`'retry'` ならメッセージを表示する。削除は確認なしで即実行する。通信・保存の失敗は一覧の上にエラー表示する。部品は `DESIGN.md` のカード、入力欄、ボタン、チェックボックス、チップ、リストに対応づける
-- [ ] **Step 5: `bun test dev/apps/web` と `bun run typecheck`。** Expected: PASS
+- [ ] **Step 5: `bun test dev/apps/src/web` と `bun run typecheck`。** Expected: PASS
 - [ ] **Step 6: `build` を実行。** Expected: `dist/` が生成される
 - [ ] **Step 7: Commit** `feat: 習慣チェックの画面を追加`
 

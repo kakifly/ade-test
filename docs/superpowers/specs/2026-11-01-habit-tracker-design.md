@@ -49,14 +49,14 @@
 
 | パッケージ | 責務 |
 |---|---|
-| `dev/apps/web` | Reactの画面。React Hook Form + zodResolver。APIクライアント |
-| `dev/apps/api` | NestJS。Drizzleでの永続化。DDLのSQLを管理 |
-| `dev/packages/schemas` | **項目ごとのzodスキーマ**（習慣名、日付、ID など）と、その組み合わせによるAPI入出力・画面のスキーマ。web / api の両方が使う |
-| `dev/packages/core` | ストリーク計算・日付処理の純粋関数（web / api の両方から使える） |
+| `dev/apps/src/web` | Reactの画面。React Hook Form + zodResolver。APIクライアント |
+| `dev/apps/src/api` | NestJS。Drizzleでの永続化。DDLのSQLを管理 |
+| `dev/packages/src/schemas` | **項目ごとのzodスキーマ**（習慣名、日付、ID など）と、その組み合わせによるAPI入出力・画面のスキーマ。web / api の両方が使う |
+| `dev/packages/src/core` | ストリーク計算・日付処理の純粋関数（web / api の両方から使える） |
 
 ## 仕様の要点
 
-- **項目スキーマ**: 習慣名・日付（`YYYY-MM-DD`）・IDなどを1項目1スキーマで `dev/packages/schemas` に置く。フォームのスキーマとAPIのリクエストスキーマは、これらを組み合わせて作る
+- **項目スキーマ**: 習慣名・日付（`YYYY-MM-DD`）・IDなどを1項目1スキーマで `dev/packages/src/schemas` に置く。フォームのスキーマとAPIのリクエストスキーマは、これらを組み合わせて作る
 - **ストリーク**: 今日から遡って、チェックが連続している日数。今日が未チェックの場合は、昨日までの連続日数を表示する（今日チェックすればその日数に+1される）。1日でも空けたら0に戻る。未来日付のデータは無視する
 - **習慣名の検証**: 前後の空白を除去し、空は不可、同名の重複は不可。この検証はスキーマ（形式）とサービス（重複）に分けず、共通化の方針に従って一箇所で扱う
 - **チェックの冪等性**: 同じ日付・同じ習慣へのチェック操作を繰り返しても結果が変わらない（DBは `(habit_id, date)` に一意制約）
@@ -74,14 +74,14 @@
 1. **プロンプト**: 習慣名のバリデーション（項目スキーマ）を題材に、曖昧な依頼と成功条件つきの依頼を比べる
 2. **コンテキスト**: CLAUDE.md（技術構成、スキーマ方針、`coding-guidelines` の3点、日本語ルール）の有無で、同じ依頼の結果がどう変わるか比べる
 3. **ハーネス**: `bun test`、編集後にテストを走らせるClaude Codeのhook（PostToolUse）、型チェック、Playwrightでの画面確認
-4. **ループ**: `dev/packages/core` のストリーク計算を最初は意図的に不完全に実装し、テスト失敗→修正→再実行のループで直す
+4. **ループ**: `dev/packages/src/core` のストリーク計算を最初は意図的に不完全に実装し、テスト失敗→修正→再実行のループで直す
 
 ## 設計時点での判断（Claudeの判断。変更可）
 
 - **方針ルール**: CLAUDE.mdに書く方針は、ユーザーのスキル `coding-guidelines` の3点（冪等性の確保、条件分岐へのコメント付与、ロジック・特にvalidationの共通化）
 - **壊れたデータ**: APIのレスポンスはzodで検証してからUIに渡す。検証に失敗したらエラー表示にする
 - **hook**: Claude Codeのhook（PostToolUse）として `.claude/settings.json` に設定。gitのhookは使わない
-- **DDLの管理**: SQLファイルを `dev/apps/api/db/ddl/` に連番で置き、それをDBに適用してから `drizzle-kit pull` でTypeScriptのスキーマを生成する。マイグレーション管理ツールは使わない
+- **DDLの管理**: SQLファイルを `dev/apps/src/api/db/ddl/` に連番で置き、それをDBに適用してから `drizzle-kit pull` でTypeScriptのスキーマを生成する。マイグレーション管理ツールは使わない
 - **Bunのバージョン**: asdfに入っているBun 1.4.2を `.tool-versions` で固定する
 - **NestJSの実行**: NestJSはBunで実行する。デコレータのメタデータなどで問題が出た場合は、ビルドをtscに切り替えることを検討する（Bun上での動作は最初のタスクで検証する）
 
