@@ -18,8 +18,17 @@ out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
 # CLAUDE.md の「タスク完了の条件」と同じ内容: 型チェック → テストDBの初期化 → すべてのテスト
-if ! { bun run verify; } >"$out" 2>&1; then
-  echo "完了前の検証に失敗しました（typecheck または db:apply:test または bun test）。直してから終えてください。末尾:" >&2
-  tail -n 30 "$out" >&2
-  exit 2
+if bun run verify >"$out" 2>&1; then
+  .claude/hooks/loop-record.sh stop pass
+  exit 0
 fi
+
+n=$(.claude/hooks/loop-record.sh stop fail "$out")
+# 同じ失敗が3回続いたら、止めずに終わらせる（無限に直させない）。Claudeはユーザーに報告する
+if [ "${n:-1}" -ge 3 ]; then
+  echo "【歯止め】同じ失敗が${n}回続いたため、これ以上は止めません。失敗したテスト名・期待値と実際の値・試したことをユーザーに報告してください。" >&2
+  exit 0
+fi
+echo "完了前の検証に失敗しました（同じ失敗の連続: ${n}回目）。直してから終えてください。末尾:" >&2
+tail -n 30 "$out" >&2
+exit 2

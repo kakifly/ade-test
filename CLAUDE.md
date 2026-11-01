@@ -40,6 +40,7 @@ dev/
   - `hook-check.sh`（PostToolUse）: Edit・Write・MultiEdit のあとに、型チェックと単体テストを実行する
   - `stop-check.sh`（Stop）: 作業を終える直前に、型チェック、テストDBの初期化、すべてのテストを実行する。シェルのコマンドで変更したファイルも検証できる。失敗すると終了コード2で、Claudeは作業を続けて直す。直前にこのhookで止めた後の再実行では止めない（無限ループの防止）
 - **コミット前の検証**: `husky`（gitのhookの管理ツール）で `.husky/pre-commit` を実行する。速いものだけ（型チェックと単体テスト）を動かし、失敗するとコミットは作られない。DBを使う結合テストは、遅く環境に依存するので、CIとタスク完了時に実行する。`bun install` の `prepare` スクリプトが、hookを有効にする。`--no-verify` で飛ばさない
+- **失敗の記録**: `hook-check.sh` と `stop-check.sh` は、失敗を `loop-record.sh` で `.claude/loop/failures.log`（git管理外）に記録し、同じ失敗の連続回数を数える。3回目に達すると、歯止めのメッセージを出す（Stop hook は止めずに終わらせ、報告させる）
 - **CI**: `.github/workflows/ci.yml`。pull request のたびと、`main` へのpush（マージ後）に、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は `bun run verify`（型チェック、テストDBの初期化、すべてのテスト）と同じ。マージ前に成功を必須にするには、GitHubのブランチ保護（Require status checks）で `CI / test` を指定する
 
 ## 資料の置き場所
@@ -49,6 +50,7 @@ dev/
 | `docs/ai-input/` | AIが読む正本（Markdown） | 要件・設計を変えるときは、ここを先に直す |
 | `docs/deliverables/` | 顧客提出用（要件定義書.docx、基本設計書.xlsx） | `ai-input/` から作る出力物。直接編集しない |
 | `docs/reference/` | 人間が閲覧する資料（テーブル仕様書.xlsx） | DDLから自動生成する。直接編集しない |
+| `docs/loop-engineering.md` | ループ（検証と修復の繰り返し）の全体設計 | 人間が読む。規則は本書に書く |
 | `docs/superpowers/` | 作業過程の設計書（specs）と実装計画（plans） | 実装の手順はplansに従う |
 | `dev/apps/src/api/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
 
@@ -103,6 +105,8 @@ dev/
 - 完了の記録は、`task-done` でテストの実行結果を台帳に残してから行う
 
 ## 失敗が続くときの歯止め（ループの終了条件）
+
+ループの全体設計は `docs/loop-engineering.md`。修復のループは `/fix-loop`、画面の確認は `/verify-ui` で行う。
 
 - 同じテストが**3回続けて**失敗したら、同じ直し方を続けない。失敗の内容と、これまで試したことを書き出し、原因を調べ直す（`superpowers:systematic-debugging`）
 - 調べ直しても直らないときは、作業を止めて、ユーザーに報告する。報告には、失敗しているテスト名、期待値と実際の値、試したことを含める
