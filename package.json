@@ -9,7 +9,9 @@
   "scripts": {
     "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p dev/scripts",
     "test": "bun test",
-    "docs:basic-design": "bun dev/scripts/src/generate-docs/gen-basic-design.ts"
+    "docs:basic-design": "bun dev/scripts/src/generate-docs/gen-basic-design.ts",
+    "test:unit": "bun test --path-ignore-patterns '**/*.int.test.ts'",
+    "test:int": "bun test '.int.test.ts'"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
