@@ -1,30 +1,30 @@
 # 基本設計（AI入力用の正本）【たたき台】
 
-要件は `requirements.md`、見た目は `DESIGN.md`、テーブル定義はDDL（`src/apps/api/db/ddl/`）が正本。顧客提出用の `基本設計書.xlsx` は、本書から作る出力物。
+要件は `requirements.md`、見た目は `DESIGN.md`、テーブル定義はDDL（`dev/apps/api/db/ddl/`）が正本。顧客提出用の `基本設計書.xlsx` は、本書から作る出力物。
 
 > 状態: 要判断の3点は確定済み（7章）。**[案]** は、Claudeの推測・提案で、まだユーザーの承認を得ていない。
 
 ## 1. システム構成
 
 ```
-ブラウザ (src/apps/web) ──HTTP/JSON──> NestJS (src/apps/api) ──Drizzle──> PostgreSQL
-        └──────────── src/packages/schemas（zod）を共有 ────────────┘
-                      src/packages/core（日付・ストリーク）はAPIが使用
+ブラウザ (dev/apps/web) ──HTTP/JSON──> NestJS (dev/apps/api) ──Drizzle──> PostgreSQL
+        └──────────── dev/packages/schemas（zod）を共有 ────────────┘
+                      dev/packages/core（日付・ストリーク）はAPIが使用
 ```
 
 | パッケージ | 責務 |
 |---|---|
-| `src/apps/web` | 画面、フォーム（React Hook Form + zodResolver）、APIクライアント |
-| `src/apps/api` | REST API、永続化（Drizzle）、重複チェックなどDBが必要な検証 |
-| `src/packages/schemas` | 項目ごとのzodスキーマと、その組み合わせ（フォーム・リクエスト・レスポンス） |
-| `src/packages/core` | `toDateString`、`addDays`、`calcStreak`（純粋関数） |
+| `dev/apps/web` | 画面、フォーム（React Hook Form + zodResolver）、APIクライアント |
+| `dev/apps/api` | REST API、永続化（Drizzle）、重複チェックなどDBが必要な検証 |
+| `dev/packages/schemas` | 項目ごとのzodスキーマと、その組み合わせ（フォーム・リクエスト・レスポンス） |
+| `dev/packages/core` | `toDateString`、`addDays`、`calcStreak`（純粋関数） |
 
-- **[案]** ストリークは**サーバー側で計算**し、APIのレスポンスに含める。画面は表示するだけにして、計算ロジックを一箇所（`src/packages/core`）に置く
+- **[案]** ストリークは**サーバー側で計算**し、APIのレスポンスに含める。画面は表示するだけにして、計算ロジックを一箇所（`dev/packages/core`）に置く
 - **[案]** APIのパスは `/api` 配下。フロントはBunの開発サーバーから、APIへプロキシする
 
 ## 2. バリデーション設計
 
-### 2.1 項目スキーマ（`src/packages/schemas/src/fields/`）
+### 2.1 項目スキーマ（`dev/packages/schemas/src/fields/`）
 
 | スキーマ | 規則 |
 |---|---|
@@ -94,7 +94,7 @@
 
 - **「今日」**: クライアントが `toDateString(new Date())` で、取得・チェックの**操作のたびに**求める。日付をまたいで画面を開いたままでも、新しい日付で記録される。画面を開き続けると表示が古くなるため、チェック操作の後は一覧を再取得する
 - **冪等性**: チェックの付与は `INSERT ... ON CONFLICT DO NOTHING`、解除は存在しなくても成功とする
-- **ストリーク**: `calcStreak(checkedDates, today)` を `src/packages/core` に置く。APIは、習慣ごとの履歴を取得して計算する
+- **ストリーク**: `calcStreak(checkedDates, today)` を `dev/packages/core` に置く。APIは、習慣ごとの履歴を取得して計算する
 - **状態更新**: 変更操作後は一覧を再取得する（**[案]** 楽観的更新はしない。単純さを優先）
 - **エラー処理**: APIの応答は、受信時に `habitResponseSchema` で検証する。形が違えばエラー表示にする
 
@@ -128,7 +128,7 @@
 1. チェック日付の許可範囲: サーバーのUTC日付の前後1日。「今日」は端末のローカル日付のまま
 2. 習慣名の最大文字数: 50
 3. 削除時の確認ダイアログ: なし
-4. ストリークはサーバー側で `src/packages/core` を使って計算する
+4. ストリークはサーバー側で `dev/packages/core` を使って計算する
 5. 同時実行制御: 楽観的ロック（`row_version`、トリガで+1）。チェックの切り替えは親の習慣の更新として扱う（設計A）
 6. 各テーブルに `txn_id` を持たせる。値はアプリ発行のUUID（`set_config`）で、未設定時はDBのトランザクションIDで代替
 7. バージョンは、サーバーの返した値や再取得で置き換える。画面で+1しない

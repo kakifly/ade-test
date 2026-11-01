@@ -23,6 +23,6 @@
 
 ## 未決・注意
 
-- DBの接続情報は `src/apps/api/.env`（`.gitignore` 済み）。ひな形は `.env.example`
+- DBの接続情報は `dev/apps/api/.env`（`.gitignore` 済み）。ひな形は `.env.example`
 - 作業ブランチ: `feature/habit-tracker`。進捗の記録は実行用の台帳にもある（`.superpowers/`、git管理外）
 - 実装計画の進行: Task 1 完了。Task 2（プロンプト体験）はユーザーの依頼文待ち

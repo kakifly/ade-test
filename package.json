@@ -3,13 +3,13 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "src/packages/*",
-    "src/apps/*"
+    "dev/packages/*",
+    "dev/apps/*"
   ],
   "scripts": {
-    "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p src/scripts",
+    "typecheck": "bun run --filter '*' typecheck && tsc --noEmit -p dev/scripts",
     "test": "bun test",
-    "docs:basic-design": "bun src/scripts/docs/gen-basic-design.ts"
+    "docs:basic-design": "bun dev/scripts/src/docs/gen-basic-design.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.4.4",
