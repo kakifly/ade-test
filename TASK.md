@@ -23,6 +23,6 @@
 
 ## 未決・注意
 
-- DBの接続情報が `src/.env` にある。実装時に `apps/api/.env` へ移し、`.env.example` を作る（`.env` は `.gitignore` 済み）
-- Bunは asdf に 1.4.2 がある。`.tool-versions` で固定する
-- 未コミットの変更あり（`.gitignore`、設計書の更新、実装計画、要件定義書、本ファイル群）
+- DBの接続情報は `src/apps/api/.env`（`.gitignore` 済み）。ひな形は `.env.example`
+- 作業ブランチ: `feature/habit-tracker`。進捗の記録は実行用の台帳にもある（`.superpowers/`、git管理外）
+- 実装計画の進行: Task 1 完了。Task 2（プロンプト体験）はユーザーの依頼文待ち

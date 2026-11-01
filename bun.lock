@@ -9,27 +9,27 @@
         "typescript": "^7.0.2",
       },
     },
-    "apps/api": {
+    "src/apps/api": {
       "name": "@habit/api",
     },
-    "apps/web": {
+    "src/apps/web": {
       "name": "@habit/web",
     },
-    "packages/core": {
+    "src/packages/core": {
       "name": "@habit/core",
     },
-    "packages/schemas": {
+    "src/packages/schemas": {
       "name": "@habit/schemas",
     },
   },
   "packages": {
-    "@habit/api": ["@habit/api@workspace:apps/api"],
+    "@habit/api": ["@habit/api@workspace:src/apps/api"],
 
-    "@habit/core": ["@habit/core@workspace:packages/core"],
+    "@habit/core": ["@habit/core@workspace:src/packages/core"],
 
-    "@habit/schemas": ["@habit/schemas@workspace:packages/schemas"],
+    "@habit/schemas": ["@habit/schemas@workspace:src/packages/schemas"],
 
-    "@habit/web": ["@habit/web@workspace:apps/web"],
+    "@habit/web": ["@habit/web@workspace:src/apps/web"],
 
     "@types/bun": ["@types/bun@1.4.4", "", { "dependencies": { "bun-types": "1.4.4" } }, "sha512-9wkRDXUXK124pEnAutE6n/l18j+i9GC5IAHK8TmX/2nlySETmky0OU6yL5U8pW1AoKh++AN9auDCr647BfurjQ=="],
 

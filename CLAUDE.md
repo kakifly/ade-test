@@ -9,6 +9,14 @@
 3. UIを作る・直すときは `DESIGN.md`（デザインの正本）
 4. 実装時は `docs/ai-input/` を参照する。顧客提出用の `docs/deliverables/` は、実装の根拠として読まない（正本は `docs/ai-input/` と DDL）
 
+## ディレクトリ構成
+
+ルート直下は `docs/`（文書）と `src/`（コード）の2つ。ルートに置くのは、ツールが要求する設定（`package.json`、`tsconfig.base.json`、`.tool-versions`、`.gitignore`）と、AIの入口になる文書（`CLAUDE.md`、`SPEC.md`、`TASK.md`、`DESIGN.md`）だけ。
+
+- `src/apps/{api,web}`: アプリ本体
+- `src/packages/{core,schemas}`: 共有ライブラリ
+- `src/scripts`: hook、DB適用、Excel・Word生成
+
 ## 資料の置き場所
 
 | 場所 | 内容 | 扱い |
@@ -17,21 +25,21 @@
 | `docs/deliverables/` | 顧客提出用（要件定義書.docx、基本設計書.xlsx） | `ai-input/` から作る出力物。直接編集しない |
 | `docs/reference/` | 人間が閲覧する資料（テーブル仕様書.xlsx） | DDLから自動生成する。直接編集しない |
 | `docs/superpowers/` | 作業過程の設計書（specs）と実装計画（plans） | 実装の手順はplansに従う |
-| `apps/api/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
+| `src/apps/api/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
 
 ## 技術構成
 
 - TypeScript、Bun（ワークスペースのモノレポ。バンドルはBun、テストは `bun test`）
-- `apps/web`: React + React Hook Form
-- `apps/api`: NestJS + Drizzle ORM + PostgreSQL
-- `packages/schemas`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
-- `packages/core`: ストリーク計算などの純粋関数
+- `src/apps/web`: React + React Hook Form
+- `src/apps/api`: NestJS + Drizzle ORM + PostgreSQL
+- `src/packages/schemas`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
+- `src/packages/core`: ストリーク計算などの純粋関数
 
 ## コーディング方針
 
 - **冪等性を確保する**: 同じ操作を繰り返しても結果が変わらないようにする（例: チェックの付与は二重に記録しない）
 - **条件分岐にはコメントを付ける**: 何のための分岐かを日本語で書く
-- **ロジックを共通化する**: 特にvalidationは `packages/schemas` に一本化し、画面とAPIで重複して書かない
+- **ロジックを共通化する**: 特にvalidationは `src/packages/schemas` に一本化し、画面とAPIで重複して書かない
 
 ## UIデザインのルール
 
@@ -49,7 +57,7 @@
 - 変更系の処理は1トランザクションにまとめ、最初に `set_config('app.txn_id', <UUID>, true)` を設定する
 - 画面側は、`row_version` を自分で増減しない。サーバーが返した値、または再取得した値で置き換える
 - チェックの付与・解除は、親の習慣のバージョンで制御し、冪等性を保つ（409でも望む状態にすでになっていれば成功として扱う）
-- トリガ、制約、DDLは `apps/api/db/ddl/` に置き、`habit_app_test` に対する結合テストで検証する
+- トリガ、制約、DDLは `src/apps/api/db/ddl/` に置き、`habit_app_test` に対する結合テストで検証する
 
 ## タスクの並行実行
 

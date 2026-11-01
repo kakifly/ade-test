@@ -22,6 +22,6 @@
 | 要件（機能・非機能・受入基準） | `docs/ai-input/requirements.md` |
 | 基本設計（構成・API・画面） | `docs/ai-input/basic-design.md`（たたき台。要判断あり） |
 | UIデザイン（色・フォント・部品のスタイル） | `DESIGN.md`（QuestUI。UIはこれを参考にする） |
-| テーブル定義 | `apps/api/db/ddl/`（DDLが正本） |
+| テーブル定義 | `src/apps/api/db/ddl/`（DDLが正本） |
 | 設計の経緯と判断 | `docs/superpowers/specs/2026-11-01-habit-tracker-design.md` |
 | 実装手順 | `docs/superpowers/plans/`（新しい技術構成向けに書き直し中） |
