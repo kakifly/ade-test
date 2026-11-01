@@ -2,7 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:tes
 import { createDb } from "../../../src/api/db/client";
 import { createApp } from "../../../src/api/main";
 
-// 結合テスト: habit_app_test に対してHTTPで検証する。実行前に `bun run db:apply:test` でDDLを適用しておく
+// 結合テスト: habit_app_test に対してHTTPで検証する。実行前に `pnpm run db:apply:test` でDDLを適用しておく
 async function loadTestUrl(): Promise<string | undefined> {
   if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
   const envFile = Bun.file(new URL("../../../src/api/.env", import.meta.url));

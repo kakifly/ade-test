@@ -15,7 +15,7 @@ TypeScript、Bun（実行・バンドル・テスト）、pnpm（パッケージ
 ```bash
 pnpm install
 cp dev/apps/src/api/.env.example dev/apps/src/api/.env   # 接続情報を書く（コミットしない）
-bun run db:apply                                          # 開発用DBにDDLを適用
+pnpm run db:apply                                          # 開発用DBにDDLを適用
 ```
 
 `.env` には、次の2つを書きます。
@@ -28,9 +28,9 @@ bun run db:apply                                          # 開発用DBにDDLを
 ## 起動
 
 ```bash
-bun run start:api     # API（http://localhost:3000）
-bun run build:web     # 画面をビルド（初回と、画面を変更したとき）
-bun run start:web     # 画面（http://localhost:5173）。/api はAPIへ転送される
+pnpm run start:api     # API（http://localhost:3000）
+pnpm run build:web     # 画面をビルド（初回と、画面を変更したとき）
+pnpm run start:web     # 画面（http://localhost:5173）。/api はAPIへ転送される
 ```
 
 ブラウザで http://localhost:5173 を開きます。ポートは環境変数 `PORT`、画面から見たAPIの宛先は `API_URL`（既定 `http://localhost:3000`）で変えられます。
@@ -39,10 +39,10 @@ bun run start:web     # 画面（http://localhost:5173）。/api はAPIへ転送
 
 | コマンド | 内容 |
 |---|---|
-| `bun run typecheck` | 全ワークスペースの型チェック |
-| `bun run test:unit` | 単体テスト（DB不要） |
-| `bun run verify` | 型チェック → テストDBの初期化 → すべてのテスト（結合テストを含む） |
-| `bun run e2e` | ブラウザでの受入確認（APIと画面を起動した状態で実行。開発用DBの習慣を削除する） |
+| `pnpm run typecheck` | 全ワークスペースの型チェック |
+| `pnpm run test:unit` | 単体テスト（DB不要） |
+| `pnpm run verify` | 型チェック → テストDBの初期化 → すべてのテスト（結合テストを含む） |
+| `pnpm run e2e` | ブラウザでの受入確認（APIと画面を起動した状態で実行。開発用DBの習慣を削除する） |
 
 コミット前（husky）には型チェックと単体テスト、PR・main への push（GitHub Actions）には `verify` と同じ内容が実行されます。ループ（検証と修復の繰り返し）の仕組みは [`docs/loop-engineering.md`](docs/loop-engineering.md) を参照してください。
 
@@ -71,7 +71,7 @@ dev/
 | `docs/reference/` | 人間が閲覧する資料（テーブル仕様書.xlsx）。DBから生成する出力物 |
 
 ```bash
-bun run docs:build   # 3つの文書をまとめて生成（テーブル仕様書は開発用DBから読む）
+pnpm run docs:build   # 3つの文書をまとめて生成（テーブル仕様書は開発用DBから読む）
 ```
 
 生成した Excel・Word は、見た目の確認ができていません。Word の目次は、開いて更新してください。

@@ -35,6 +35,6 @@ jobs:
         with:
           bun-version-file: .tool-versions
       - run: pnpm install --frozen-lockfile
-      - run: bun run typecheck
-      - run: bun run db:apply:test
+      - run: pnpm run typecheck
+      - run: pnpm run db:apply:test
       - run: bun test

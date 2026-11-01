@@ -1,2 +1,2 @@
 # コミット前の検証: 速いものだけ（型チェックと単体テスト）。DBを使う結合テストはCIで実行する
-bun run typecheck && bun run test:unit
+pnpm run typecheck && pnpm run test:unit

@@ -2,7 +2,7 @@ import { chromium } from 'playwright-core';
 import os from 'node:os';
 import { mkdirSync } from 'node:fs';
 
-// 画面の受入確認（A-01〜A-05、A-07〜A-09、XSS）。APIと画面を起動した状態で実行する: bun run e2e
+// 画面の受入確認（A-01〜A-05、A-07〜A-09、XSS）。APIと画面を起動した状態で実行する: pnpm run e2e
 // 環境変数: CHROME_PATH（ブラウザの実行ファイル）、BASE_URL、API_URL、OUT_DIR（スクリーンショットの出力先）
 // 注意: 開発用DB（habit_app_dev）の習慣を、最初と最後に全て削除する
 const exe = process.env.CHROME_PATH ?? `${os.homedir()}/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome`;

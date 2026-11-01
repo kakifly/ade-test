@@ -2,7 +2,7 @@ import { afterAll, beforeEach, describe, expect, test } from "bun:test";
 import { createDb } from "../../../src/api/db/client";
 
 // 結合テスト: habit_app_test に対してDDL（トリガ・制約）を検証する。
-// 実行前に `bun run db:apply:test` でDDLを適用しておく。
+// 実行前に `pnpm run db:apply:test` でDDLを適用しておく。
 // 環境変数が無いときは、api の .env から TEST_DATABASE_URL だけを読む
 async function loadTestUrl(): Promise<string | undefined> {
   if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;

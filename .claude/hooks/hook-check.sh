@@ -7,7 +7,7 @@ cd "$(dirname "$0")/../.." || exit 1
 out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
-if { bun run typecheck && bun run test:unit; } >"$out" 2>&1; then
+if { pnpm run typecheck && pnpm run test:unit; } >"$out" 2>&1; then
   .claude/hooks/loop-record.sh post-edit pass
   exit 0
 fi

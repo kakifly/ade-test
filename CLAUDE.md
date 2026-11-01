@@ -39,9 +39,9 @@ dev/
 - **hook**: 設定は `.claude/settings.json`、hookが呼ぶスクリプトは `.claude/hooks/` に置く（`dev/scripts` には置かない）
   - `hook-check.sh`（PostToolUse）: Edit・Write・MultiEdit のあとに、型チェックと単体テストを実行する
   - `stop-check.sh`（Stop）: 作業を終える直前に、型チェック、テストDBの初期化、すべてのテストを実行する。シェルのコマンドで変更したファイルも検証できる。失敗すると終了コード2で、Claudeは作業を続けて直す。直前にこのhookで止めた後の再実行では止めない（無限ループの防止）
-- **コミット前の検証**: `husky`（gitのhookの管理ツール）で `.husky/pre-commit` を実行する。速いものだけ（型チェックと単体テスト）を動かし、失敗するとコミットは作られない。DBを使う結合テストは、遅く環境に依存するので、CIとタスク完了時に実行する。`bun install` の `prepare` スクリプトが、hookを有効にする。`--no-verify` で飛ばさない
+- **コミット前の検証**: `husky`（gitのhookの管理ツール）で `.husky/pre-commit` を実行する。速いものだけ（型チェックと単体テスト）を動かし、失敗するとコミットは作られない。DBを使う結合テストは、遅く環境に依存するので、CIとタスク完了時に実行する。`pnpm install` の `prepare` スクリプトが、hookを有効にする。`--no-verify` で飛ばさない
 - **失敗の記録**: `hook-check.sh` と `stop-check.sh` は、失敗を `loop-record.sh` で `.claude/loop/failures.log`（git管理外）に記録し、同じ失敗の連続回数を数える。3回目に達すると、歯止めのメッセージを出す（Stop hook は止めずに終わらせ、報告させる）
-- **CI**: `.github/workflows/ci.yml`。pull request のたびと、`main` へのpush（マージ後）に、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は `bun run verify`（型チェック、テストDBの初期化、すべてのテスト）と同じ。マージ前に成功を必須にするには、GitHubのブランチ保護（Require status checks）で `CI / test` を指定する
+- **CI**: `.github/workflows/ci.yml`。pull request のたびと、`main` へのpush（マージ後）に、型チェック、テストDB（使い捨てのPostgreSQL）の初期化、すべてのテストを実行する。手順は `pnpm run verify`（型チェック、テストDBの初期化、すべてのテスト）と同じ。マージ前に成功を必須にするには、GitHubのブランチ保護（Require status checks）で `CI / test` を指定する
 
 ## 資料の置き場所
 
@@ -98,9 +98,9 @@ dev/
 
 - 実装計画のタスクは、**すべてのテストが成功した状態**で完了とする。一部のテストだけを実行して完了にしない
 - 完了の前に、次を実行して結果を確認する。1つでも失敗があれば、そのタスクは未完了とする
-  1. `bun run typecheck`（型チェック）
-  2. `bun run db:apply:test` のあと `bun test`（単体テストと結合テストのすべて）
-   - 1と2は、`bun run verify` でまとめて実行できる
+  1. `pnpm run typecheck`（型チェック）
+  2. `pnpm run db:apply:test` のあと `bun test`（単体テストと結合テストのすべて）
+   - 1と2は、`pnpm run verify` でまとめて実行できる
 - 失敗したテストは、タスクと無関係に見えても、完了報告に名前を書く。テストを削除・スキップして通すことはしない
 - 失敗の原因が自分の変更でないとき（他のタスクの作業途中など）は、その旨を報告し、直るまで完了にしない
 - 完了の記録は、`task-done` でテストの実行結果を台帳に残してから行う
