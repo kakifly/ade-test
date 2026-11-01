@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { parseMarkdown } from '../../src/docs/markdown.ts';
+import { parseMarkdown } from '../../src/generate-docs/markdown.ts';
 
 describe('parseMarkdown', () => {
   test('見出しのレベルと文言を取り出す', () => {

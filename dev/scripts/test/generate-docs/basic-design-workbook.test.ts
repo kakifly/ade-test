@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { buildBasicDesignWorkbook } from '../../src/docs/basic-design-workbook.ts';
+import { buildBasicDesignWorkbook } from '../../src/generate-docs/basic-design-workbook.ts';
 
 const SAMPLE = `# 基本設計（AI入力用の正本）
 

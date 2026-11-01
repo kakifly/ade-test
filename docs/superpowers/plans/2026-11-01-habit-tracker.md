@@ -60,7 +60,7 @@
 | `dev/apps/api/src/habits/*` | リポジトリ、サービス、コントローラ、エラー変換 |
 | `dev/apps/test/api/**/*.int.test.ts` | DB・HTTPの結合テスト |
 | `dev/apps/web/src/*` | トークン、API、フォーム、一覧、状態管理 |
-| `dev/scripts/src/{hook-check.sh,db-apply.sh,docs/*}` | hook、DB適用、Excel・Word出力 |
+| `dev/scripts/src/{hook-check.sh,db-apply.sh,generate-docs/*}` | hook、DB適用、Excel・Word出力 |
 | `.claude/settings.json` | 編集後の検証hook |
 | `docs/experience-log.md` | 4つの体験の記録 |
 
@@ -182,7 +182,7 @@
 ### Task 8（P2）: 文書の出力（Excel・Word）
 
 **Files:**
-- Create: `dev/scripts/src/docs/{gen-table-spec.ts,gen-basic-design.ts,build-requirements-docx.js}`、`docs/reference/テーブル仕様書.xlsx`、`docs/deliverables/基本設計書.xlsx`
+- Create: `dev/scripts/src/generate-docs/{gen-table-spec.ts,gen-basic-design.ts,build-requirements-docx.js}`、`docs/reference/テーブル仕様書.xlsx`、`docs/deliverables/基本設計書.xlsx`
 - Modify: `docs/deliverables/要件定義書.docx`（再生成）、ルート `package.json`（`docs:build`）
 
 **Interfaces:**
@@ -191,7 +191,7 @@
 
 - [ ] **Step 1: `gen-table-spec.ts` を実装する。** `information_schema` と `pg_catalog` から、テーブル・列・型・NULL可否・既定値・主キー・外部キー・一意制約・トリガを読み、1テーブル1シートで `テーブル仕様書.xlsx` に出力する。表紙シート（生成日時、DB名）を付ける。`exceljs` を使う
 - [ ] **Step 2: `gen-basic-design.ts` を実装する。** `basic-design.md` の見出しと表を読み、章ごとのシート（構成、バリデーション、API、画面、処理、データ、決定事項）に出力する。表は表のまま、本文は1セルに入れる
-- [ ] **Step 3: `build-requirements-docx.js` を、作業用の既存スクリプトから `dev/scripts/src/docs/` へ移して更新する。** N-07、N-08、A-09〜A-11、行バージョンと `txn_id` のデータ項目、同時実行制御の機能説明、UIデザイン（QuestUIを参考にする）を追記する
+- [ ] **Step 3: `build-requirements-docx.js` を、作業用の既存スクリプトから `dev/scripts/src/generate-docs/` へ移して更新する。** N-07、N-08、A-09〜A-11、行バージョンと `txn_id` のデータ項目、同時実行制御の機能説明、UIデザイン（QuestUIを参考にする）を追記する
 - [ ] **Step 4: 出力を検証する。** `unzip -t` でzipの整合を確認し、`exceljs` で読み戻してシート名と行数を確認する。生成したxlsxに秘密情報（接続文字列、パスワード）が含まれないことを確認する
 - [ ] **Step 5: Commit** `feat: Excel・Word文書の生成スクリプトと出力を追加`
 
