@@ -60,7 +60,7 @@
 | `dev/apps/src/api/habits/*` | リポジトリ、サービス、コントローラ、エラー変換 |
 | `dev/apps/test/api/**/*.int.test.ts` | DB・HTTPの結合テスト |
 | `dev/apps/src/web/*` | トークン、API、フォーム、一覧、状態管理 |
-| `dev/scripts/src/{hook-check.sh,db-apply.sh,generate-docs/*}` | hook、DB適用、Excel・Word出力 |
+| `dev/scripts/src/{db-apply.sh,generate-docs/*}`、`.claude/hooks/hook-check.sh` | hook、DB適用、Excel・Word出力 |
 | `.claude/settings.json` | 編集後の検証hook |
 | `docs/experience-log.md` | 4つの体験の記録 |
 
@@ -108,7 +108,7 @@
 ### Task 4: 【体験: ハーネス】テスト基盤・型チェック・hook
 
 **Files:**
-- Create: `dev/packages/src/core/dates.ts`、`dev/packages/test/core/dates.test.ts`、`dev/scripts/src/hook-check.sh`、`.claude/settings.json`
+- Create: `dev/packages/src/core/dates.ts`、`dev/packages/test/core/dates.test.ts`、`.claude/hooks/hook-check.sh`、`.claude/settings.json`
 - Modify: ルート `package.json`（`typecheck`、`test:unit`）
 
 **Interfaces:**
@@ -119,7 +119,7 @@
 - [ ] **Step 3: `dates.ts` を実装する。** UTCではなくローカル日付で計算する（`Date` のローカルコンストラクタ）
 - [ ] **Step 4: `bun test dev/packages/src/core`。** Expected: PASS
 - [ ] **Step 5: ルートに `test:unit`（結合テスト `*.int.test.ts` を含まない）と `typecheck`（各ワークスペースで `tsc --noEmit`）を整える。** 結合テストはファイル名で区別し、除外方法は実際に実行して確認する
-- [ ] **Step 6: `dev/scripts/src/hook-check.sh` を作る。** `typecheck` と `test:unit` を実行し、失敗時は結果の末尾を標準エラーに出して終了コード2で終わる。`.claude/settings.json` に `PostToolUse`（対象 `Edit|Write|MultiEdit`）で呼び出す設定を書く
+- [ ] **Step 6: `.claude/hooks/hook-check.sh` を作る。** `typecheck` と `test:unit` を実行し、失敗時は結果の末尾を標準エラーに出して終了コード2で終わる。`.claude/settings.json` に `PostToolUse`（対象 `Edit|Write|MultiEdit`）で呼び出す設定を書く
 - [ ] **Step 7: hookの検証。** `dates.ts` をわざと壊して編集し、hookが失敗を報告することを確認してから元に戻す。第3章に、設定の内容と観察（報告の見え方、実行時間）を記録する
 - [ ] **Step 8: Commit** `feat: 日付ユーティリティと検証hookを追加`
 

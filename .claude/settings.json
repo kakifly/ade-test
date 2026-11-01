@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR\"/dev/scripts/src/hook-check.sh"
+            "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/hook-check.sh"
           }
         ]
       }

@@ -25,4 +25,4 @@
 
 - DBの接続情報は `dev/apps/src/api/.env`（`.gitignore` 済み）。ひな形は `.env.example`
 - 作業ブランチ: `feature/habit-tracker`。進捗の記録は実行用の台帳にもある（`.superpowers/`、git管理外）
-- 実装計画の進行: Task 1 完了。Task 2（プロンプト体験）はユーザーの依頼文待ち
+- 実装計画の進行: Task 1〜7 完了（プロンプト・コンテキスト・ハーネス・ループの体験を記録済み）。次は Task 8〜10（テーブル仕様書・要件定義書の再生成、NestJS API、React画面）

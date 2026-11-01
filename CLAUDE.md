@@ -15,6 +15,7 @@
 
 ```
 docs/                          文書（下の「資料の置き場所」を参照）
+.claude/                       Claude Code の設定（settings.json）とhookスクリプト（hooks/）
 dev/
   apps/
     src/{api,web}/             アプリのソース。各フォルダがワークスペース（package.json、tsconfig.json を含む）
@@ -23,7 +24,7 @@ dev/
     src/{core,schemas}/        共有ライブラリのソース。各フォルダがワークスペース
     test/{core,schemas}/       共有ライブラリのテスト。src と同じ構成にする
   scripts/
-    src/                       hook、DB適用、Excel・Word生成（generate-docs/）のソース
+    src/                       DB適用、Excel・Word生成（generate-docs/）のソース
     test/                      scripts のテスト。src と同じ構成にする
 ```
 
@@ -34,6 +35,7 @@ dev/
 - **テストの種類はファイル名で分ける**: 単体テストは `*.test.ts`、DBやHTTPを使う結合テストは `*.int.test.ts`
 - **ワークスペース**: `dev/apps/src/*` と `dev/packages/src/*` が対象。テスト用の `test/` にはパッケージ定義を置かない
 - **DDLと設定**: `dev/apps/src/api/db/ddl/`（DDL）と `dev/apps/src/api/.env`（接続情報。コミットしない）は、api のフォルダに置く
+- **hook**: 設定は `.claude/settings.json`、hookが呼ぶスクリプトは `.claude/hooks/` に置く（`dev/scripts` には置かない）
 - **構成を変えるとき**: 先にこの節を直す。`SPEC.md`、`docs/ai-input/`、`package.json`（workspaces）、各 `tsconfig.json` も合わせて直す
 
 ## 資料の置き場所

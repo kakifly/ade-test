@@ -62,7 +62,7 @@
 
 - **やったこと**: （設計書は、別のエージェント（ビルダーチェック）に読ませて、不明点を洗い出した）
   - テストと型チェックの仕組みを整えた。`bun run typecheck`（各ワークスペースと scripts の `tsc --noEmit`）、`bun run test:unit`（結合テスト `*.int.test.ts` を除く）。除外は、ダミーの結合テストをわざと失敗させ、`--path-ignore-patterns '**/*.int.test.ts'` で実行結果から外れることを確かめた。
-  - `.claude/settings.json` に PostToolUse の hook を設定した。対象は `Edit|Write|MultiEdit`、実行するのは `dev/scripts/src/hook-check.sh`（型チェックと単体テストを順に実行し、失敗したら末尾30行を標準エラーに出して終了コード2で終わる）。
+  - `.claude/settings.json` に PostToolUse の hook を設定した。対象は `Edit|Write|MultiEdit`、実行するのは `.claude/hooks/hook-check.sh`（型チェックと単体テストを順に実行し、失敗したら末尾30行を標準エラーに出して終了コード2で終わる）。
   - 検証のため、題材の `addDays`（`dev/packages/src/core/dates.ts`）を TDD で作った。先にテスト4件を書いて失敗（モジュールなし）を確認し、実装して成功させた。
 - **結果**:
   - スクリプトを直接実行: 正常時は終了コード0、`d + n` を `d - n` に壊すと終了コード2で、失敗したテストの内容が出た。
