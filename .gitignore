@@ -2,4 +2,5 @@
 *:Zone.Identifier
 .env
 .superpowers/
+dist/
 node_modules/
