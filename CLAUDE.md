@@ -11,13 +11,15 @@
 
 ## ディレクトリ構成
 
-ルート直下は `docs/`（文書）と `dev/`（コード）の2つ。ルートに置くのは、ツールが要求する設定（`package.json`、`tsconfig.base.json`、`.tool-versions`、`.gitignore`）と、AIの入口になる文書（`CLAUDE.md`、`SPEC.md`、`TASK.md`、`DESIGN.md`）、Claude Codeの設定（`.claude/`）、CI（`.github/`）だけ。
+ルート直下は `docs/`（文書）と `dev/`（コード）の2つ。開発に関する設定（`package.json`、`pnpm-workspace.yaml`、`pnpm-lock.yaml`、`tsconfig.base.json`、`tsconfig.json`、`node_modules`）は、`dev/` の直下に置く。ルートに置くのは、ツールが場所を決めているもの（`.tool-versions`、`.gitignore`、gitのhookの `.husky/`、CIの `.github/`、Claude Codeの設定の `.claude/`）と、AIの入口になる文書（`CLAUDE.md`、`SPEC.md`、`TASK.md`、`DESIGN.md`）、`README.md` だけ。
+
+**コマンドは `dev/` で実行する**（`cd dev` してから `pnpm run verify` など。ルートから実行するなら `pnpm --dir dev run verify`）。hook、husky、CI は、この形で `dev/` を指している。
 
 ```
 docs/                          文書（下の「資料の置き場所」を参照）
 .claude/                       Claude Code の設定（settings.json）とhookスクリプト（hooks/）
 .github/workflows/             CI（ci.yml）
-dev/
+dev/                           package.json、pnpm-workspace.yaml、tsconfig など、開発の設定もここに置く
   apps/
     src/{api,web}/             アプリのソース。各フォルダがワークスペース（package.json、tsconfig.json を含む）
     test/{api,web}/            アプリのテスト。src と同じ構成にする

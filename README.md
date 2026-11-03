@@ -12,10 +12,13 @@ TypeScript、Bun（実行・バンドル・テスト）、pnpm（パッケージ
 
 前提: Bun 1.4.2 と pnpm 10.6.1（`.tool-versions` で固定）、PostgreSQL（開発用とテスト用に別のデータベース）、`psql`
 
+以降のコマンドは、`dev/` ディレクトリで実行します（`package.json` が `dev/` にあるため）。
+
 ```bash
+cd dev
 pnpm install
-cp dev/apps/src/api/.env.example dev/apps/src/api/.env   # 接続情報を書く（コミットしない）
-pnpm run db:apply                                          # 開発用DBにDDLを適用
+cp apps/src/api/.env.example apps/src/api/.env   # 接続情報を書く（コミットしない）
+pnpm run db:apply                                 # 開発用DBにDDLを適用
 ```
 
 `.env` には、次の2つを書きます。

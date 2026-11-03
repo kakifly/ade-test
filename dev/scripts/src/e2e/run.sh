@@ -33,7 +33,7 @@ esac
 # 3. e2e用DBの初期化と、画面のビルド
 # ================================================================
 bash "$root/dev/scripts/src/db-apply.sh" e2e
-(cd "$root" && pnpm run build:web >/dev/null)
+(cd "$root/dev" && pnpm run build:web >/dev/null)
 
 # ================================================================
 # 4. API と画面の起動

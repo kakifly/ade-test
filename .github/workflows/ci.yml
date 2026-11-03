@@ -27,10 +27,16 @@ jobs:
           --health-retries 10
     env:
       TEST_DATABASE_URL: postgres://ci:ci@localhost:5432/habit_app_test
+    # pnpm と bun のコマンドは、package.json のある dev/ で実行する
+    defaults:
+      run:
+        working-directory: dev
     steps:
       - uses: actions/checkout@v4
-      # パッケージ管理は pnpm（バージョンは package.json の packageManager）、実行・テストは Bun
+      # パッケージ管理は pnpm（バージョンは dev/package.json の packageManager）、実行・テストは Bun
       - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: dev/package.json
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version-file: .tool-versions

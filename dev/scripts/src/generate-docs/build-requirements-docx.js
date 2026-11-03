@@ -285,7 +285,7 @@ const doc = new Document({
 // ================================================================
 const buf = await Packer.toBuffer(doc);
 {
-  const out = process.argv[2] ?? 'docs/deliverables/要件定義書.docx';
+  const out = process.argv[2] ?? '../docs/deliverables/要件定義書.docx';
   fs.writeFileSync(out, buf);
   console.log('wrote', out, buf.length);
 }

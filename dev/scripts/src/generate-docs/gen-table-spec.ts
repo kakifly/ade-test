@@ -12,7 +12,7 @@ import { buildTableSpecWorkbook } from './table-spec-workbook.ts';
 function databaseUrl(): string {
   // 環境変数があれば、.env は読まない
   if (process.env.DATABASE_URL) return process.env.DATABASE_URL;
-  const envPath = 'dev/apps/src/api/.env';
+  const envPath = 'apps/src/api/.env';
   // .env がある場合だけ、DATABASE_URL の行を探す
   if (existsSync(envPath)) {
     for (const line of readFileSync(envPath, 'utf8').split('\n')) {
@@ -36,7 +36,7 @@ if (schema.dbName !== 'habit_app_dev') throw new Error(`想定外のDBです: ${
 // 2. テーブル仕様書（Excel）の書き出し
 //    出力先のフォルダが無ければ作る
 // ================================================================
-mkdirSync('docs/reference', { recursive: true });
-const out = 'docs/reference/テーブル仕様書.xlsx';
+mkdirSync('../docs/reference', { recursive: true });
+const out = '../docs/reference/テーブル仕様書.xlsx';
 await buildTableSpecWorkbook(schema, new Date()).xlsx.writeFile(out);
 console.log(`wrote ${out}（DB: ${schema.dbName}、テーブル ${schema.tables.length}）`);

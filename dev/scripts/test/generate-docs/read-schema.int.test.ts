@@ -5,7 +5,7 @@ import { readSchema } from '../../src/generate-docs/read-schema.ts';
 // テストDB（habit_app_test）の接続先を環境変数、無ければ api の .env から得る
 function testUrl(): string | undefined {
   if (process.env.TEST_DATABASE_URL) return process.env.TEST_DATABASE_URL;
-  const p = 'dev/apps/src/api/.env';
+  const p = 'apps/src/api/.env';
   if (!existsSync(p)) return undefined;
   const m = /^\s*TEST_DATABASE_URL\s*=\s*(.*)$/m.exec(readFileSync(p, 'utf8'));
   return m?.[1]?.trim().replace(/^['"]|['"]$/g, '');

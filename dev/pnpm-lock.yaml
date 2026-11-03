@@ -27,7 +27,7 @@ importers:
         specifier: ^7.0.2
         version: 7.0.2
 
-  dev/apps/src/api:
+  apps/src/api:
     dependencies:
       '@habit/core':
         specifier: workspace:*
@@ -57,7 +57,7 @@ importers:
         specifier: ^7.8.2
         version: 7.8.2
 
-  dev/apps/src/web:
+  apps/src/web:
     dependencies:
       '@habit/core':
         specifier: workspace:*
@@ -97,9 +97,9 @@ importers:
         specifier: ^21.0.4
         version: 21.0.4
 
-  dev/share/src/core: {}
+  share/src/core: {}
 
-  dev/share/src/db:
+  share/src/db:
     dependencies:
       drizzle-orm:
         specifier: ^0.45.4
@@ -112,7 +112,7 @@ importers:
         specifier: ^0.31.11
         version: 0.31.11
 
-  dev/share/src/zod:
+  share/src/zod:
     dependencies:
       zod:
         specifier: ^4.6.7

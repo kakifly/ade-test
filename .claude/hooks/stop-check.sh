@@ -10,7 +10,7 @@ if grep -q '"stop_hook_active"[[:space:]]*:[[:space:]]*true' <(cat); then
 fi
 
 # コードに変更がなければ、検証しない（会話だけのターンで毎回動かさない）
-if [ -z "$(git status --porcelain -- dev package.json pnpm-lock.yaml 2>/dev/null)" ]; then
+if [ -z "$(git status --porcelain -- dev 2>/dev/null)" ]; then
   exit 0
 fi
 
@@ -18,7 +18,7 @@ out=$(mktemp)
 trap 'rm -f "$out"' EXIT
 
 # CLAUDE.md の「タスク完了の条件」と同じ内容: 型チェック → テストDBの初期化 → すべてのテスト
-if pnpm run verify >"$out" 2>&1; then
+if pnpm --dir dev run verify >"$out" 2>&1; then
   .claude/hooks/loop-record.sh stop pass
   exit 0
 fi
