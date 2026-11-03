@@ -10,7 +10,7 @@ describe('OrderTableSample', () => {
   test('方式1: 親行の下に子行が出て、閉じると子行が隠れる', () => {
     render(<OrderTableSample />)
     expect(screen.getAllByLabelText('品名')).toHaveLength(3)
-    fireEvent.click(screen.getByRole('button', { name: '山田商店の明細を閉じる' }))
+    fireEvent.click(screen.getByRole('button', { name: '注文1の明細を閉じる' }))
     expect(screen.getAllByLabelText('品名')).toHaveLength(1)
   })
   test('方式2: 先頭行のセルだけが rowSpan で結合される', () => {

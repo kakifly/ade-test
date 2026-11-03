@@ -6,8 +6,10 @@ import {
   getExpandedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FieldCell } from './FieldCell'
+import { addItem, ItemCount, OrderTotal, RemoveItemButton } from './OrderCells'
 
 /** 親行（注文）。子行として明細を持つ */
 type OrderRow = {
@@ -46,131 +48,109 @@ export function NestedOrderTable({ form }: Props) {
 
   // ================================================================
   // 1. 表のデータ作成
-  //    フォームの値から、親行（subRows に子行を持つ）の配列を作る。
+  //    フォームの値から、親行（子行を持つ）の配列を作る。
+  //    描画のたびに作り直すと、表が「データが変わった」と判断して無限に再描画するので、値が変わったときだけ作る。
   // ================================================================
   const orders = useWatch({ control, name: 'orders' })
-  const data: Row[] = orders.map((o, orderIndex) => ({
-    kind: 'order',
-    orderIndex,
-    customer: o.customer,
-    children: o.items.map((_, itemIndex) => ({ kind: 'item', orderIndex, itemIndex })),
-  }))
+  const data = useMemo<Row[]>(
+    () =>
+      orders.map((o, orderIndex) => ({
+        kind: 'order',
+        orderIndex,
+        customer: o.customer,
+        children: o.items.map((_, itemIndex) => ({ kind: 'item', orderIndex, itemIndex })),
+      })),
+    [orders],
+  )
 
   // ================================================================
   // 2. 列の定義
   //    親行と子行で、同じ列に別の内容を出す。
+  //    列を毎回作り直すと入力欄が作り直されてフォーカスが外れるので、useMemo で固定する。
+  //    値に依存する表示（件数・合計・削除の可否）は、自分で値を読む小さな部品に任せる。
   // ================================================================
-  const columns = [
-    helper.display({
-      id: 'customer',
-      header: '顧客',
-      cell: ({ row }) => {
-        const r = row.original
-        // 子行は顧客欄を空ける（インデントで親子を示す）
-        if (r.kind === 'item') return <span className="cell__indent" />
-        return (
-          <div className="cell__customer">
-            <button
-              type="button"
-              className="btn btn--sm cell__toggle"
-              aria-expanded={row.getIsExpanded()}
-              aria-label={`${r.customer || '注文'}の明細を${row.getIsExpanded() ? '閉じる' : '開く'}`}
-              onClick={row.getToggleExpandedHandler()}
-            >
-              {row.getIsExpanded() ? '▼' : '▶'}
-            </button>
-            <FieldCell control={control} name={`orders.${r.orderIndex}.customer`} label="顧客" />
-          </div>
-        )
-      },
-    }),
-    helper.display({
-      id: 'itemName',
-      header: '品名',
-      cell: ({ row }) => {
-        const r = row.original
-        // 親行は明細の件数だけを出す
-        if (r.kind === 'order') return <span className="cell__summary">{r.children.length}件の明細</span>
-        return <FieldCell control={control} name={`orders.${r.orderIndex}.items.${r.itemIndex}.itemName`} label="品名" />
-      },
-    }),
-    helper.display({
-      id: 'quantity',
-      header: '数量',
-      cell: ({ row }) => {
-        const r = row.original
-        // 親行は数量の合計を出す
-        if (r.kind === 'order') {
-          const total = (orders[r.orderIndex]?.items ?? []).reduce((sum, i) => sum + (Number.isNaN(i.quantity) ? 0 : i.quantity), 0)
-          return <span className="cell__summary">合計 {total}</span>
-        }
-        return (
-          <FieldCell
-            control={control}
-            name={`orders.${r.orderIndex}.items.${r.itemIndex}.quantity`}
-            type="number"
-            label="数量"
-          />
-        )
-      },
-    }),
-    helper.display({
-      id: 'actions',
-      header: '',
-      cell: ({ row }) => {
-        const r = row.original
-        // 親行は明細の追加、子行は明細の削除（最後の1件は削除できない）
-        if (r.kind === 'order') {
+  const columns = useMemo(
+    () => [
+      helper.display({
+        id: 'customer',
+        header: '顧客',
+        cell: ({ row }) => {
+          const r = row.original
+          // 子行は顧客欄を空ける（インデントで親子を示す）
+          if (r.kind === 'item') return <span className="cell__indent" />
           return (
-            <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(r.orderIndex)}>
-              明細を追加
-            </button>
+            <div className="cell__customer">
+              <button
+                type="button"
+                className="btn btn--sm cell__toggle"
+                aria-expanded={row.getIsExpanded()}
+                aria-label={`注文${r.orderIndex + 1}の明細を${row.getIsExpanded() ? '閉じる' : '開く'}`}
+                onClick={row.getToggleExpandedHandler()}
+              >
+                {row.getIsExpanded() ? '▼' : '▶'}
+              </button>
+              <FieldCell control={control} name={`orders.${r.orderIndex}.customer`} label="顧客" />
+            </div>
           )
-        }
-        const count = orders[r.orderIndex]?.items.length ?? 0
-        return (
-          <button
-            type="button"
-            className="btn btn--destructive btn--sm"
-            disabled={count <= 1}
-            onClick={() => removeItem(r.orderIndex, r.itemIndex)}
-          >
-            削除
-          </button>
-        )
-      },
-    }),
-  ]
+        },
+      }),
+      helper.display({
+        id: 'itemName',
+        header: '品名',
+        cell: ({ row }) => {
+          const r = row.original
+          // 親行は明細の件数だけを出す
+          if (r.kind === 'order') return <ItemCount control={control} orderIndex={r.orderIndex} />
+          return <FieldCell control={control} name={`orders.${r.orderIndex}.items.${r.itemIndex}.itemName`} label="品名" />
+        },
+      }),
+      helper.display({
+        id: 'quantity',
+        header: '数量',
+        cell: ({ row }) => {
+          const r = row.original
+          // 親行は数量の合計を出す
+          if (r.kind === 'order') return <OrderTotal control={control} orderIndex={r.orderIndex} />
+          return (
+            <FieldCell
+              control={control}
+              name={`orders.${r.orderIndex}.items.${r.itemIndex}.quantity`}
+              type="number"
+              label="数量"
+            />
+          )
+        },
+      }),
+      helper.display({
+        id: 'actions',
+        header: '',
+        cell: ({ row }) => {
+          const r = row.original
+          // 親行は明細の追加、子行は明細の削除
+          if (r.kind === 'order') {
+            return (
+              <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(getValues, setValue, r.orderIndex)}>
+                明細を追加
+              </button>
+            )
+          }
+          return (
+            <RemoveItemButton
+              control={control}
+              orderIndex={r.orderIndex}
+              itemIndex={r.itemIndex}
+              getValues={getValues}
+              setValue={setValue}
+            />
+          )
+        },
+      }),
+    ],
+    [control, getValues, setValue],
+  )
 
   // ================================================================
-  // 3. 行の追加・削除
-  //    配列ごと入れ替える。入力欄は常にフォームの値を読むので、表示はずれない。
-  // ================================================================
-  /**
-   * 注文に空の明細を1行足す。
-   *
-   * @param orderIndex 対象の注文の添字
-   */
-  function addItem(orderIndex: number) {
-    const items = getValues(`orders.${orderIndex}.items`)
-    setValue(`orders.${orderIndex}.items`, [...items, { itemName: '', quantity: 1 }])
-  }
-  /**
-   * 注文から明細を1行消す。
-   *
-   * @param orderIndex 対象の注文の添字
-   * @param itemIndex 消す明細の添字
-   */
-  function removeItem(orderIndex: number, itemIndex: number) {
-    const items = getValues(`orders.${orderIndex}.items`)
-    setValue(
-      `orders.${orderIndex}.items`,
-      items.filter((_, i) => i !== itemIndex),
-    )
-  }
-
-  // ================================================================
-  // 4. 表の組み立て
+  // 3. 表の組み立て
   //    getSubRows で子行を取り出し、既定ですべて展開しておく。
   // ================================================================
   const table = useReactTable({
@@ -180,6 +160,8 @@ export function NestedOrderTable({ form }: Props) {
     getCoreRowModel: getCoreRowModel(),
     getExpandedRowModel: getExpandedRowModel(),
     initialState: { expanded: true },
+    // データが変わっても、開閉の状態を初期化しない
+    autoResetExpanded: false,
   })
 
   return (
