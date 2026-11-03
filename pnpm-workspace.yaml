@@ -1,3 +1,3 @@
 packages:
-  - dev/packages/src/*
+  - dev/share/src/*
   - dev/apps/src/*

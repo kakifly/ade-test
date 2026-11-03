@@ -1,6 +1,6 @@
 import { Global, Module, type DynamicModule } from "@nestjs/common";
 import { DB } from "./common/db";
-import { createDb } from "./db/client";
+import { createDb } from "@habit/db";
 import { HabitsModule } from "./habits/habits.module";
 
 @Global()

@@ -25,7 +25,7 @@ else
 fi
 
 # 番号順（ファイル名順）に適用する
-for f in "$api"/db/ddl/*.sql; do
+for f in "$root/dev/share/src/db/ddl"/*.sql; do
   echo "適用: $(basename "$f")"
   psql "$url" -v ON_ERROR_STOP=1 -q -f "$f"
 done

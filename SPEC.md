@@ -23,6 +23,6 @@
 | 基本設計（構成・API・画面） | `docs/ai-input/basic-design.md`（たたき台。要判断あり） |
 | UIデザイン（色・フォント・部品のスタイル） | `DESIGN.md`（QuestUI。UIはこれを参考にする） |
 | ディレクトリ構成・テストの置き場所 | `CLAUDE.md`（ディレクトリ構成） |
-| テーブル定義 | `dev/apps/src/api/db/ddl/`（DDLが正本） |
+| テーブル定義 | `dev/share/src/db/ddl/`（DDLが正本） |
 | 設計の経緯と判断 | `docs/superpowers/specs/2026-11-01-habit-tracker-design.md` |
 | 実装手順 | `docs/superpowers/plans/`（新しい技術構成向けに書き直し中） |

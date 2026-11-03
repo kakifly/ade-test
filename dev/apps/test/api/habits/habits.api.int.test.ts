@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from "bun:test";
-import { createDb } from "../../../src/api/db/client";
+import { createDb } from "../../../../share/src/db";
 import { createApp } from "../../../src/api/main";
 
 // 結合テスト: habit_app_test に対してHTTPで検証する。実行前に `pnpm run db:apply:test` でDDLを適用しておく

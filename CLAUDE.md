@@ -21,9 +21,9 @@ dev/
   apps/
     src/{api,web}/             アプリのソース。各フォルダがワークスペース（package.json、tsconfig.json を含む）
     test/{api,web}/            アプリのテスト。src と同じ構成にする
-  packages/
-    src/{core,zod}/        共有ライブラリのソース。各フォルダがワークスペース
-    test/{core,zod}/       共有ライブラリのテスト。src と同じ構成にする
+  share/                       複数のアプリで共通に使うもの
+    src/{core,zod,db}/         共通のソース。各フォルダがワークスペース（core: 純粋関数、zod: zodスキーマ、db: テーブル定義・DDL・DBクライアント）
+    test/{core,zod,db}/        共通部分のテスト。src と同じ構成にする
   scripts/
     src/                       DB適用、Excel・Word生成（generate-docs/）のソース
     test/                      scripts のテスト。src と同じ構成にする
@@ -31,11 +31,11 @@ dev/
 
 ### 配置のルール
 
-- **ソースとテストを分ける**: `apps`、`packages`、`scripts` のどれも、`src` と `test` を同じ階層に並べる。テストはソースの隣ではなく、`test` 側に置く
-- **`test` の中は `src` と同じ構成にする**: 例として、`dev/packages/src/core/dates.ts` のテストは `dev/packages/test/core/dates.test.ts`、`dev/apps/src/api/habits/habits.service.ts` のテストは `dev/apps/test/api/habits/habits.service.test.ts` に置く
+- **ソースとテストを分ける**: `apps`、`share`、`scripts` のどれも、`src` と `test` を同じ階層に並べる。テストはソースの隣ではなく、`test` 側に置く
+- **`test` の中は `src` と同じ構成にする**: 例として、`dev/share/src/core/dates.ts` のテストは `dev/share/test/core/dates.test.ts`、`dev/apps/src/api/habits/habits.service.ts` のテストは `dev/apps/test/api/habits/habits.service.test.ts` に置く
 - **テストの種類はファイル名で分ける**: 単体テストは `*.test.ts`、DBやHTTPを使う結合テストは `*.int.test.ts`
-- **ワークスペース**: `dev/apps/src/*` と `dev/packages/src/*` が対象。テスト用の `test/` にはパッケージ定義を置かない
-- **DDLと設定**: `dev/apps/src/api/db/ddl/`（DDL）と `dev/apps/src/api/.env`（接続情報。コミットしない）は、api のフォルダに置く
+- **ワークスペース**: `dev/apps/src/*` と `dev/share/src/*` が対象。テスト用の `test/` にはパッケージ定義を置かない
+- **DDLと設定**: DDLとテーブルオブジェクトは、共通の `dev/share/src/db/` に置く（`ddl/` がDDL、`schema.ts` がテーブルオブジェクト）。接続情報の `dev/apps/src/api/.env` はコミットしない
 - **hook**: 設定は `.claude/settings.json`、hookが呼ぶスクリプトは `.claude/hooks/` に置く（`dev/scripts` には置かない）
   - `hook-check.sh`（PostToolUse）: Edit・Write・MultiEdit のあとに、型チェックと単体テストを実行する
   - `stop-check.sh`（Stop）: 作業を終える直前に、型チェック、テストDBの初期化、すべてのテストを実行する。シェルのコマンドで変更したファイルも検証できる。失敗すると終了コード2で、Claudeは作業を続けて直す。直前にこのhookで止めた後の再実行では止めない（無限ループの防止）
@@ -52,7 +52,7 @@ dev/
 | `docs/reference/` | 人間が閲覧する資料（テーブル仕様書.xlsx） | DDLから自動生成する。直接編集しない |
 | `docs/loop-engineering.md` | ループ（検証と修復の繰り返し）の全体設計 | 人間が読む。規則は本書に書く |
 | `docs/superpowers/` | 作業過程の設計書（specs）と実装計画（plans） | 実装の手順はplansに従う |
-| `dev/apps/src/api/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
+| `dev/share/src/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
 
 ## 技術構成
 
@@ -60,14 +60,15 @@ dev/
 - 依存の追加は `pnpm add`（`bun add` / `bun install` は使わない）。`workspace:*` でパッケージ間を参照する
 - `dev/apps/src/web`: React + React Hook Form
 - `dev/apps/src/api`: NestJS + Drizzle ORM + PostgreSQL
-- `dev/packages/src/zod`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
-- `dev/packages/src/core`: ストリーク計算などの純粋関数
+- `dev/share/src/zod`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
+- `dev/share/src/core`: ストリーク計算などの純粋関数
+- `dev/share/src/db`: Drizzleのテーブルオブジェクト（`schema.ts`）、DBクライアント、DDL。複数のアプリから使える
 
 ## コーディング方針
 
 - **冪等性を確保する**: 同じ操作を繰り返しても結果が変わらないようにする（例: チェックの付与は二重に記録しない）
 - **条件分岐にはコメントを付ける**: 何のための分岐かを日本語で書く
-- **ロジックを共通化する**: 特にvalidationは `dev/packages/src/zod` に一本化し、画面とAPIで重複して書かない
+- **ロジックを共通化する**: 特にvalidationは `dev/share/src/zod` に一本化し、画面とAPIで重複して書かない
 
 ## UIデザインのルール
 
@@ -85,7 +86,7 @@ dev/
 - 変更系の処理は1トランザクションにまとめ、最初に `set_config('app.txn_id', <UUID>, true)` を設定する
 - 画面側は、`row_version` を自分で増減しない。サーバーが返した値、または再取得した値で置き換える
 - チェックの付与・解除は、親の習慣のバージョンで制御し、冪等性を保つ（409でも望む状態にすでになっていれば成功として扱う）
-- トリガ、制約、DDLは `dev/apps/src/api/db/ddl/` に置き、`habit_app_test` に対する結合テストで検証する
+- トリガ、制約、DDLは `dev/share/src/db/ddl/` に置き、`habit_app_test` に対する結合テストで検証する
 
 ## タスクの並行実行
 

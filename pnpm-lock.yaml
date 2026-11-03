@@ -31,10 +31,13 @@ importers:
     dependencies:
       '@habit/core':
         specifier: workspace:*
-        version: link:../../../packages/src/core
+        version: link:../../../share/src/core
+      '@habit/db':
+        specifier: workspace:*
+        version: link:../../../share/src/db
       '@habit/zod':
         specifier: workspace:*
-        version: link:../../../packages/src/zod
+        version: link:../../../share/src/zod
       '@nestjs/common':
         specifier: ^12.3.2
         version: 12.3.2(reflect-metadata@0.2.2)(rxjs@7.8.2)
@@ -47,28 +50,21 @@ importers:
       drizzle-orm:
         specifier: ^0.45.4
         version: 0.45.4(bun-types@1.4.4)(postgres@4.0.0)
-      postgres:
-        specifier: ^4.0.0
-        version: 4.0.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
-    devDependencies:
-      drizzle-kit:
-        specifier: ^0.31.11
-        version: 0.31.11
 
   dev/apps/src/web:
     dependencies:
       '@habit/core':
         specifier: workspace:*
-        version: link:../../../packages/src/core
+        version: link:../../../share/src/core
       '@habit/zod':
         specifier: workspace:*
-        version: link:../../../packages/src/zod
+        version: link:../../../share/src/zod
       '@hookform/resolvers':
         specifier: ^7.0.1
         version: 7.0.1(@standard-schema/spec@1.1.0)(react-hook-form@7.91.0(@types/react@19.3.0)(react@19.3.1))(zod@4.6.7)
@@ -98,9 +94,22 @@ importers:
         specifier: ^21.0.4
         version: 21.0.4
 
-  dev/packages/src/core: {}
+  dev/share/src/core: {}
 
-  dev/packages/src/zod:
+  dev/share/src/db:
+    dependencies:
+      drizzle-orm:
+        specifier: ^0.45.4
+        version: 0.45.4(bun-types@1.4.4)(postgres@4.0.0)
+      postgres:
+        specifier: ^4.0.0
+        version: 4.0.0
+    devDependencies:
+      drizzle-kit:
+        specifier: ^0.31.11
+        version: 0.31.11
+
+  dev/share/src/zod:
     dependencies:
       zod:
         specifier: ^4.6.7

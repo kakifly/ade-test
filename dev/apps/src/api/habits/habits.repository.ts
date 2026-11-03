@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Inject, Injectable, type OnModuleDestroy } from "@nestjs/common";
 import { DB } from "../common/db";
-import type { Db } from "../db/client";
+import type { Db } from "@habit/db";
 import { AppError } from "../common/app-error";
 
 export interface HabitRow {
