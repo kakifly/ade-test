@@ -1,5 +1,5 @@
 import { toDateString } from '@habit/core'
-import type { HabitResponse } from '@habit/schemas'
+import type { HabitResponse } from '@habit/zod'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiError, createApiClient, type ApiClient } from './api'
 import { HabitForm } from './components/HabitForm'

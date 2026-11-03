@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { calcStreak, isWithinServerWindow } from "@habit/core";
-import type { HabitResponse } from "@habit/schemas";
+import type { HabitResponse } from "@habit/zod";
 import { AppError } from "../common/app-error";
 import { HabitsRepository } from "./habits.repository";
 

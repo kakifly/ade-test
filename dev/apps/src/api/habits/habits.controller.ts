@@ -8,7 +8,7 @@ import {
   type CreateHabitRequest,
   type ToggleCheckParams,
   type VersionQuery,
-} from "@habit/schemas";
+} from "@habit/zod";
 import { TxnId } from "../common/txn-context.interceptor";
 import { ZodValidationPipe } from "../common/zod-validation.pipe";
 import { HabitsService } from "./habits.service";

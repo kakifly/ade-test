@@ -1,5 +1,5 @@
 {
-  "name": "@habit/schemas",
+  "name": "@habit/zod",
   "private": true,
   "type": "module",
   "exports": {

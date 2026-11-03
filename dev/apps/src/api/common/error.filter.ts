@@ -1,5 +1,5 @@
 import { Catch, HttpException, Logger, type ArgumentsHost, type ExceptionFilter } from "@nestjs/common";
-import type { ErrorResponse } from "@habit/schemas";
+import type { ErrorResponse } from "@habit/zod";
 import { AppError } from "./app-error";
 
 @Catch()

@@ -8,7 +8,7 @@ import {
   toggleCheckParamsSchema,
   versionQuerySchema,
   versionResponseSchema,
-} from '../../src/schemas'
+} from '../../src/zod'
 
 const id = '3f2b8c1e-5d4a-4b6f-9a7e-1c2d3e4f5a6b'
 

@@ -8,7 +8,7 @@
 
 ```
 ブラウザ (dev/apps/src/web) ──HTTP/JSON──> NestJS (dev/apps/src/api) ──Drizzle──> PostgreSQL
-        └──────────── dev/packages/src/schemas（zod）を共有 ────────────┘
+        └──────────── dev/packages/src/zod を共有 ────────────┘
                       dev/packages/src/core（日付・ストリーク）はAPIが使用
 ```
 
@@ -16,7 +16,7 @@
 |---|---|
 | `dev/apps/src/web` | 画面、フォーム（React Hook Form + zodResolver）、APIクライアント |
 | `dev/apps/src/api` | REST API、永続化（Drizzle）、重複チェックなどDBが必要な検証 |
-| `dev/packages/src/schemas` | 項目ごとのzodスキーマと、その組み合わせ（フォーム・リクエスト・レスポンス） |
+| `dev/packages/src/zod` | 項目ごとのzodスキーマと、その組み合わせ（フォーム・リクエスト・レスポンス） |
 | `dev/packages/src/core` | `toDateString`、`addDays`、`calcStreak`（純粋関数） |
 
 - **[案]** ストリークは**サーバー側で計算**し、APIのレスポンスに含める。画面は表示するだけにして、計算ロジックを一箇所（`dev/packages/src/core`）に置く
@@ -24,7 +24,7 @@
 
 ## 2. バリデーション設計
 
-### 2.1 項目スキーマ（`dev/packages/src/schemas/fields/`）
+### 2.1 項目スキーマ（`dev/packages/src/zod/fields/`）
 
 | スキーマ | 規則 |
 |---|---|

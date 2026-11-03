@@ -44,7 +44,7 @@
 
 全テーブルに「行バージョン」（`row_version`）と「トランザクションID」（`txn_id`）を持たせる。値の更新はDBのトリガが行う（N-07、N-08）。
 
-入力値の検証規則は `dev/packages/src/schemas` に一本化し、画面とAPIで共有する。
+入力値の検証規則は `dev/packages/src/zod` に一本化し、画面とAPIで共有する。
 
 ## 非機能要件
 

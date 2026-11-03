@@ -1,4 +1,4 @@
-import type { HabitResponse } from '@habit/schemas'
+import type { HabitResponse } from '@habit/zod'
 import { StreakChip } from './StreakChip'
 
 type Props = {

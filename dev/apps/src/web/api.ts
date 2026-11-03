@@ -5,7 +5,7 @@ import {
   type ErrorCode,
   type HabitResponse,
   type VersionResponse,
-} from '@habit/schemas'
+} from '@habit/zod'
 
 /** APIの失敗。status は HTTP ステータス（通信失敗・形の不一致は 0） */
 export class ApiError extends Error {

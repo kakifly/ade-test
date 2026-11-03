@@ -1,4 +1,4 @@
-import type { HabitResponse } from '@habit/schemas'
+import type { HabitResponse } from '@habit/zod'
 
 export const makeHabit = (over: Partial<HabitResponse> = {}): HabitResponse => ({
   id: '11111111-1111-4111-8111-111111111111',

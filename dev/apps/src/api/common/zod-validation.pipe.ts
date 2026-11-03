@@ -1,7 +1,7 @@
 import { Injectable, type PipeTransform } from "@nestjs/common";
 import { AppError } from "./app-error";
 
-// zod スキーマの safeParse だけを使う最小の型（検証規則は @habit/schemas に一本化し、ここでは再記述しない）
+// zod スキーマの safeParse だけを使う最小の型（検証規則は @habit/zod に一本化し、ここでは再記述しない）
 interface Parsable<T> {
   safeParse(
     value: unknown,

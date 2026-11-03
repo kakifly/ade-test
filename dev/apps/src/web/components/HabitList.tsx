@@ -1,4 +1,4 @@
-import type { HabitResponse } from '@habit/schemas'
+import type { HabitResponse } from '@habit/zod'
 import { HabitRow } from './HabitRow'
 
 type Props = {

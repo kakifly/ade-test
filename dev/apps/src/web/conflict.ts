@@ -1,4 +1,4 @@
-import type { HabitResponse } from '@habit/schemas'
+import type { HabitResponse } from '@habit/zod'
 
 /**
  * 409（バージョン競合）のあと、再取得した最新の習慣を見て次の動きを決める。

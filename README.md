@@ -53,7 +53,7 @@ docs/                  文書（要件・設計・顧客提出用の出力物・
 dev/
   apps/src/{api,web}/  アプリのソース（NestJS、React）
   apps/test/{api,web}/ アプリのテスト
-  packages/src/{core,schemas}/  共有ライブラリ（ストリーク計算、zodスキーマ）
+  packages/src/{core,zod}/  共有ライブラリ（ストリーク計算、zodスキーマ）
   packages/test/       共有ライブラリのテスト
   scripts/             DB適用、文書の生成、画面の受入確認
 .claude/               Claude Code の設定、hook、スラッシュコマンド
@@ -81,4 +81,4 @@ pnpm run docs:build   # 3つの文書をまとめて生成（テーブル仕様�
 - **ストリーク**: サーバーが `dev/packages/src/core` の `calcStreak` で計算する。今日が未チェックなら、昨日までの連続日数を表示する
 - **同時実行制御**: 全テーブルに `row_version`（楽観的ロック）と `txn_id` を持たせ、DBのトリガが更新する。競合は 409 `VERSION_CONFLICT`
 - **冪等性**: チェックの付与・解除は、繰り返しても結果が変わらない。409でも、望む状態になっていれば成功として扱う
-- **バリデーション**: 項目ごとのzodスキーマを `dev/packages/src/schemas` に一本化し、画面とAPIで共有する
+- **バリデーション**: 項目ごとのzodスキーマを `dev/packages/src/zod` に一本化し、画面とAPIで共有する

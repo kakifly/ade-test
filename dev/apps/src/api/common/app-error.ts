@@ -1,4 +1,4 @@
-import type { ErrorCode } from "@habit/schemas";
+import type { ErrorCode } from "@habit/zod";
 
 // 業務上のエラー。HTTPステータスとエラーコードを持つ（フィルタが errorResponseSchema の形に変換する）
 export class AppError extends Error {

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createHabitFormSchema, type CreateHabitForm } from '@habit/schemas'
+import { createHabitFormSchema, type CreateHabitForm } from '@habit/zod'
 import { useForm } from 'react-hook-form'
 
 type Props = {

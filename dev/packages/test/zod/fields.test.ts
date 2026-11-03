@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test'
-import { habitNameField } from '../../src/schemas/fields/habitName'
-import { dateField } from '../../src/schemas/fields/date'
-import { rowVersionField } from '../../src/schemas/fields/rowVersion'
-import { habitIdField } from '../../src/schemas/fields/habitId'
-import { streakField } from '../../src/schemas/fields/streak'
-import { createdAtField } from '../../src/schemas/fields/createdAt'
+import { habitNameField } from '../../src/zod/fields/habitName'
+import { dateField } from '../../src/zod/fields/date'
+import { rowVersionField } from '../../src/zod/fields/rowVersion'
+import { habitIdField } from '../../src/zod/fields/habitId'
+import { streakField } from '../../src/zod/fields/streak'
+import { createdAtField } from '../../src/zod/fields/createdAt'
 
 describe('habitNameField', () => {
   test('空文字・空白のみ・51文字を拒否する', () => {

@@ -22,8 +22,8 @@ dev/
     src/{api,web}/             アプリのソース。各フォルダがワークスペース（package.json、tsconfig.json を含む）
     test/{api,web}/            アプリのテスト。src と同じ構成にする
   packages/
-    src/{core,schemas}/        共有ライブラリのソース。各フォルダがワークスペース
-    test/{core,schemas}/       共有ライブラリのテスト。src と同じ構成にする
+    src/{core,zod}/        共有ライブラリのソース。各フォルダがワークスペース
+    test/{core,zod}/       共有ライブラリのテスト。src と同じ構成にする
   scripts/
     src/                       DB適用、Excel・Word生成（generate-docs/）のソース
     test/                      scripts のテスト。src と同じ構成にする
@@ -60,14 +60,14 @@ dev/
 - 依存の追加は `pnpm add`（`bun add` / `bun install` は使わない）。`workspace:*` でパッケージ間を参照する
 - `dev/apps/src/web`: React + React Hook Form
 - `dev/apps/src/api`: NestJS + Drizzle ORM + PostgreSQL
-- `dev/packages/src/schemas`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
+- `dev/packages/src/zod`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
 - `dev/packages/src/core`: ストリーク計算などの純粋関数
 
 ## コーディング方針
 
 - **冪等性を確保する**: 同じ操作を繰り返しても結果が変わらないようにする（例: チェックの付与は二重に記録しない）
 - **条件分岐にはコメントを付ける**: 何のための分岐かを日本語で書く
-- **ロジックを共通化する**: 特にvalidationは `dev/packages/src/schemas` に一本化し、画面とAPIで重複して書かない
+- **ロジックを共通化する**: 特にvalidationは `dev/packages/src/zod` に一本化し、画面とAPIで重複して書かない
 
 ## UIデザインのルール
 
