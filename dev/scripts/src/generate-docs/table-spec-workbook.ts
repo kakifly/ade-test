@@ -54,7 +54,7 @@ export type SchemaInfo = {
 };
 
 /** 文書のフォント */
-const FONT = 'Yu Gothic';
+export const FONT = 'Yu Gothic';
 /** 見出し行の背景色（ARGB） */
 const HEAD_FILL = 'FFDCE6F1';
 /** 罫線1本分の定義 */
@@ -67,7 +67,7 @@ const BORDERS = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER };
  * @param row 対象の行
  * @param head 見出し行ならtrue
  */
-function styleRow(row: ExcelJS.Row, head: boolean): void {
+export function styleRow(row: ExcelJS.Row, head: boolean): void {
   row.eachCell((cell) => {
     cell.font = { name: FONT, size: 10, bold: head };
     cell.alignment = { wrapText: true, vertical: 'top' };

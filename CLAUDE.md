@@ -52,6 +52,7 @@ dev/                           package.json、pnpm-workspace.yaml、tsconfig な
 | `docs/ai-input/` | AIが読む正本（Markdown） | 要件・設計を変えるときは、ここを先に直す |
 | `docs/deliverables/` | 顧客提出用（要件定義書.docx、基本設計書.xlsx） | `ai-input/` から作る出力物。直接編集しない |
 | `docs/reference/` | 人間が閲覧する資料（テーブル仕様書.xlsx） | DDLから自動生成する。直接編集しない |
+| `docs/ai-input/data-schema.md` と `docs/reference/データスキーマ.xlsx` | データスキーマ（データドメイン）とテーブル設計の定義 | **人は Excel を編集し、AI は md を編集する**。人が Excel を編集したら、人が「mdを更新して」と指示し、AI が Excel の内容を md に反映する。AI が md を更新したら、`pnpm run docs:data-schema` で Excel に再生成する（Excel に未コミットの変更があるときは、人の編集を消さないよう中止する）。AI は Excel を直接編集しない |
 | `docs/loop-engineering.md` | ループ（検証と修復の繰り返し）の全体設計 | 人間が読む。規則は本書に書く |
 | `docs/superpowers/` | 作業過程の設計書（specs）と実装計画（plans） | 実装の手順はplansに従う |
 | `dev/share/src/db/ddl/` | DBのDDL（SQL） | テーブル定義の正本。Drizzleのスキーマはここから `drizzle-kit pull` で生成する |
