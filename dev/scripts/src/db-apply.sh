@@ -31,6 +31,10 @@ case "$mode" in
   *)    url="${DATABASE_URL:?DATABASE_URL が未設定です}" ;;
 esac
 if [ "$mode" = "test" ] || [ "$mode" = "e2e" ]; then
+  # 作業領域から、共有のテスト用・e2e用DBを初期化しない
+  # shellcheck disable=SC1091
+  . "$(dirname "$0")/db-guard.sh"
+  assert_dedicated_db "$root" "$url" || exit 1
   # テスト用・e2e用のDBは毎回まっさらにする（publicスキーマの所有者ではないため、このアプリのオブジェクトだけを消す）
   psql "$url" -v ON_ERROR_STOP=1 -q -c 'DROP TABLE IF EXISTS habit_checks, habits CASCADE; DROP FUNCTION IF EXISTS set_row_meta() CASCADE;'
 fi

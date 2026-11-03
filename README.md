@@ -36,7 +36,7 @@ pnpm run build:web     # 画面をビルド（初回と、画面を変更した�
 pnpm run start:web     # 画面（http://localhost:5173）。/api はAPIへ転送される
 ```
 
-ブラウザで http://localhost:5173 を開きます。ポートは環境変数 `PORT`、画面から見たAPIの宛先は `API_URL`（既定 `http://localhost:3000`）で変えられます。
+ブラウザで http://localhost:5173 を開きます。ポートは、環境変数 `API_PORT`（API、既定 3000）と `WEB_PORT`（画面、既定 5173）で変えられます。画面から見たAPIの宛先は `API_URL`（既定は `http://localhost:` と `API_PORT`）です。作業領域（git worktree）では、`pnpm run wt create` が作業領域ごとに別のポートを `.env` に書くので、複数を同時に起動しても重なりません。
 
 ## テスト
 

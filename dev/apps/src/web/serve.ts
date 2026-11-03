@@ -1,9 +1,9 @@
 import { join, normalize } from 'node:path'
 
-/** 待ち受けポート。環境変数 PORT、無ければ 5173 */
-const port = Number(process.env.PORT ?? 5173)
-/** 転送先のAPIのURL（末尾のスラッシュなし）。環境変数 API_URL、無ければ localhost:3000 */
-const apiUrl = (process.env.API_URL ?? 'http://localhost:3000').replace(/\/$/, '')
+/** 待ち受けポート。作業領域ごとに分けられるよう、環境変数 WEB_PORT を優先し、無ければ PORT、どちらも無ければ 5173 */
+const port = Number(process.env.WEB_PORT ?? process.env.PORT ?? 5173)
+/** 転送先のAPIのURL（末尾のスラッシュなし）。環境変数 API_URL、無ければ localhost の API_PORT（既定 3000） */
+const apiUrl = (process.env.API_URL ?? `http://localhost:${process.env.API_PORT ?? 3000}`).replace(/\/$/, '')
 /** ビルド済みの画面ファイル（dist/）の置き場所 */
 const distDir = join(import.meta.dir, 'dist')
 

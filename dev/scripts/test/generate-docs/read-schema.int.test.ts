@@ -15,7 +15,8 @@ const url = testUrl();
 describe.skipIf(!url)('readSchema（habit_app_test）', () => {
   const schema = readSchema(url!);
   test('DB名とテーブルを読める', () => {
-    expect(schema.dbName).toBe('habit_app_test');
+    // 共有のテスト用DB（habit_app_test）か、作業領域専用のDB（habit_app_test_<名前>）であること。開発用DBでないことを確かめる
+    expect(schema.dbName).toMatch(/^habit_app_test(_.+)?$/);
     expect(schema.tables.map((t) => t.name)).toEqual(['habit_checks', 'habits']);
   });
   test('制約とトリガを読める', () => {

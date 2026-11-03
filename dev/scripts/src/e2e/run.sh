@@ -22,12 +22,16 @@ e2e_url="${E2E_DATABASE_URL:?E2E_DATABASE_URL が未設定です}"
 
 # ================================================================
 # 2. 接続先の安全確認
-#    e2e用以外のDBを消さないよう、DB名が habit_app_e2e のときだけ進める
+#    e2e用以外のDBを消さないよう、DB名が habit_app_e2e または habit_app_e2e_<名前> のときだけ進める。
+#    作業領域からは、共有の habit_app_e2e を使えない
 # ================================================================
 case "$e2e_url" in
-  */habit_app_e2e) ;;
-  *) echo "E2E_DATABASE_URL が habit_app_e2e ではありません。中止します" >&2; exit 1 ;;
+  */habit_app_e2e|*/habit_app_e2e_*) ;;
+  *) echo "E2E_DATABASE_URL が habit_app_e2e（または habit_app_e2e_<名前>）ではありません。中止します" >&2; exit 1 ;;
 esac
+# shellcheck disable=SC1091
+. "$root/dev/scripts/src/db-guard.sh"
+assert_dedicated_db "$root" "$e2e_url" || exit 1
 
 # ================================================================
 # 3. e2e用DBの初期化と、画面のビルド
@@ -37,7 +41,9 @@ bash "$root/dev/scripts/src/db-apply.sh" e2e
 
 # ================================================================
 # 4. API と画面の起動
-#    開発用の起動（3000 / 5173）と重ならないよう、別のポートを使う。終了時に必ず止める
+#    開発用の起動（3000 / 5173）と重ならないよう、別のポートを使う（既定は 3100 / 5273）。
+#    作業領域では、wt.sh が割り当てた E2E_API_PORT / E2E_WEB_PORT（.env）を使うので、作業領域どうしでも重ならない。
+#    終了時に必ず止める
 # ================================================================
 api_port="${E2E_API_PORT:-3100}"
 web_port="${E2E_WEB_PORT:-5273}"
@@ -45,9 +51,9 @@ pids=()
 cleanup() { for p in "${pids[@]:-}"; do [ -n "$p" ] && kill "$p" 2>/dev/null || true; done; }
 trap cleanup EXIT
 
-(cd "$api" && DATABASE_URL="$e2e_url" PORT="$api_port" exec bun main.ts) >/dev/null 2>&1 &
+(cd "$api" && DATABASE_URL="$e2e_url" API_PORT="$api_port" exec bun main.ts) >/dev/null 2>&1 &
 pids+=($!)
-(cd "$root/dev/apps/src/web" && PORT="$web_port" API_URL="http://localhost:$api_port" exec bun serve.ts) >/dev/null 2>&1 &
+(cd "$root/dev/apps/src/web" && WEB_PORT="$web_port" API_URL="http://localhost:$api_port" exec bun serve.ts) >/dev/null 2>&1 &
 pids+=($!)
 
 # 両方が応答するまで待つ（最大30秒）

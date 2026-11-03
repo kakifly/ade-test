@@ -36,7 +36,8 @@ if (import.meta.main) {
   // 接続先が無ければ起動しない
   if (!url) throw new Error("DATABASE_URL が未設定です");
   const app = await createApp(url);
-  const port = Number(process.env.PORT ?? 3000);
+  // 待ち受けポート: 作業領域ごとに分けられるよう API_PORT を優先し、無ければ PORT、どちらも無ければ 3000
+  const port = Number(process.env.API_PORT ?? process.env.PORT ?? 3000);
   await app.listen(port);
   console.log(`API を起動しました: ポート ${port}`);
 }

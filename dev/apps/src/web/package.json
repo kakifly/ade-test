@@ -8,7 +8,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit -p .",
     "build": "bun build ./index.html --outdir ./dist",
-    "start": "bun serve.ts"
+    "start": "bun --env-file=../api/.env serve.ts"
   },
   "dependencies": {
     "@habit/core": "workspace:*",

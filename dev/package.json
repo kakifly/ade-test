@@ -17,6 +17,7 @@
     "verify": "pnpm run typecheck && pnpm run db:apply:test && bun test",
     "prepare": "cd .. && husky",
     "e2e": "bash scripts/src/e2e/run.sh",
+    "wt": "bash scripts/src/wt.sh",
     "db:apply:e2e": "bash scripts/src/db-apply.sh e2e",
     "start:api": "pnpm --filter @habit/api start",
     "build:web": "pnpm --filter @habit/web build",
