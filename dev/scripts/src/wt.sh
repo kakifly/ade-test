@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # 作業領域（git worktree）を、専用のテスト用・e2e用DBとあわせて作る・消す・一覧する。
-#   wt.sh create <名前>  : .worktrees/<名前>/ にブランチ feature/<名前> の作業領域を作り、専用DBと .env を用意する
+#   wt.sh create <名前>  : <本体>-worktrees/<名前>/ にブランチ feature/<名前> の作業領域を作り、専用DBと .env を用意する
 #   wt.sh env <名前>     : 既にある作業領域に、専用DBと .env を用意する（手で作った作業領域用）
 #   wt.sh remove <名前>  : 作業領域を消し、専用DBを削除し、マージ済みならブランチも消す
 #   wt.sh list           : 作業領域と専用DBの一覧を出す（作業領域が無いDBは「残骸」と示す）
 # 専用DB: habit_app_test_<名前>、habit_app_e2e_<名前>（名前の - は _ にする）。開発用DBは共有のまま。
+# 作業領域は、本体のリポジトリの外（隣の <本体のフォルダ名>-worktrees/）に置く。環境変数 WT_ROOT で置き場所を変えられる。
 # 接続情報（パスワードを含む）は、画面にも引数にも出さない。DBの作成は1か所（create_dbs）にまとめてある。
 set -euo pipefail
 
@@ -13,6 +14,8 @@ set -euo pipefail
 #    本体のリポジトリのルートと、元になる .env（共有DBの接続先）を決めて読み込む
 # ================================================================
 main_root="$(cd "$(git rev-parse --path-format=absolute --git-common-dir)/.." && pwd)"
+# 作業領域を置く親フォルダ。既定は本体の隣（例: ade-test の隣の ade-test-worktrees）。本体の中には置かない
+wt_root="${WT_ROOT:-${main_root}-worktrees}"
 base_env="$main_root/dev/apps/src/api/.env"
 [ -f "$base_env" ] || { echo "$base_env がありません" >&2; exit 1; }
 set -a
@@ -66,7 +69,7 @@ port_slot_for() {
   cur="$(sed -n 's/^PORT_SLOT=//p' "$dir/dev/apps/src/api/.env" 2>/dev/null | head -1)"
   # 既に割り当て済みなら、そのまま使う
   if [ -n "$cur" ]; then echo "$cur"; return; fi
-  used="$(for e in "$main_root"/.worktrees/*/dev/apps/src/api/.env; do [ -f "$e" ] && sed -n 's/^PORT_SLOT=//p' "$e"; done)"
+  used="$(for e in "$wt_root"/*/dev/apps/src/api/.env; do [ -f "$e" ] && sed -n 's/^PORT_SLOT=//p' "$e"; done)"
   for n in $(seq 1 99); do
     if ! grep -qx "$n" <<<"$used"; then echo "$n"; return; fi
   done
@@ -97,7 +100,7 @@ cmd="${1:-}"
 case "$cmd" in
   create)
     name="${2:-}"; validate_name "$name"; slug="$(slug_of "$name")"
-    dir="$main_root/.worktrees/$name"
+    dir="$wt_root/$name"
     [ ! -e "$dir" ] || { echo "$dir は既にあります" >&2; exit 1; }
     # 先に専用DBを作り、作業領域の作成に失敗したら削除して元に戻す
     create_dbs "$slug"
@@ -106,25 +109,25 @@ case "$cmd" in
     fi
     write_env "$dir" "$slug"
     pnpm --dir "$dir/dev" install >/dev/null
-    echo "作成しました: .worktrees/$name（ブランチ feature/$name、専用DB habit_app_test_$slug / habit_app_e2e_$slug）"
+    echo "作成しました: $dir（ブランチ feature/$name、専用DB habit_app_test_$slug / habit_app_e2e_$slug）"
     ;;
   env)
     name="${2:-}"; validate_name "$name"; slug="$(slug_of "$name")"
-    dir="$main_root/.worktrees/$name"
+    dir="$wt_root/$name"
     [ -d "$dir" ] || { echo "$dir がありません" >&2; exit 1; }
     create_dbs "$slug"
     write_env "$dir" "$slug"
-    echo "専用DBと .env を用意しました: .worktrees/$name（habit_app_test_$slug / habit_app_e2e_$slug）"
+    echo "専用DBと .env を用意しました: $dir（habit_app_test_$slug / habit_app_e2e_$slug）"
     ;;
   remove)
     name="${2:-}"; validate_name "$name"; slug="$(slug_of "$name")"
-    dir="$main_root/.worktrees/$name"
+    dir="$wt_root/$name"
     # 未コミットの変更があると、ここで止まる（強制はしない）。DBは、作業領域を消せてから削除する
     git -C "$main_root" worktree remove "$dir"
     drop_dbs "$slug"
     # マージ済みのブランチだけ消す（未マージなら残す）
     git -C "$main_root" branch -d "feature/$name" || echo "ブランチ feature/$name はマージされていないので残しました" >&2
-    echo "削除しました: .worktrees/$name と専用DB"
+    echo "削除しました: $dir と専用DB"
     ;;
   list)
     git -C "$main_root" worktree list
@@ -132,7 +135,7 @@ case "$cmd" in
     admin -c "SELECT datname FROM pg_database WHERE datname ~ '^habit_app_(test|e2e)_' ORDER BY datname;" | while read -r db; do
       slug="${db#habit_app_test_}"; slug="${slug#habit_app_e2e_}"
       # 作業領域のフォルダが無いDBは、消し忘れの残骸
-      if ls -d "$main_root/.worktrees/"* 2>/dev/null | sed 's#.*/##; s#-#_#g' | grep -qx "$slug"; then echo "$db"; else echo "$db  （残骸: 作業領域がありません）"; fi
+      if ls -d "$wt_root/"* 2>/dev/null | sed 's#.*/##; s#-#_#g' | grep -qx "$slug"; then echo "$db"; else echo "$db  （残骸: 作業領域がありません）"; fi
     done
     ;;
   *)

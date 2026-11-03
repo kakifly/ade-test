@@ -112,14 +112,14 @@ dev/                           package.json、pnpm-workspace.yaml、tsconfig な
 
 ## 作業領域（git worktree）
 
-- 作業は、`main` のワーキングツリーで直接せず、**`git worktree` で作業領域を分けて**行う。作業ごとに、`main` から専用のブランチを切り、`.worktrees/<ブランチ名>/` に作業領域を作る（`.worktrees/` は `.gitignore` 済み）
-- 作業領域は、`pnpm run wt create <名前>`（`dev/` で実行）で作る。`.worktrees/<名前>/`、ブランチ `feature/<名前>`、**専用のテスト用DBとe2e用DB**（`habit_app_test_<名前>`、`habit_app_e2e_<名前>`）、`.env`、`pnpm install` をまとめて用意する。手で作った作業領域には `pnpm run wt env <名前>` を使う。名前は小文字・数字・ハイフンで40文字以内
+- 作業は、`main` のワーキングツリーで直接せず、**`git worktree` で作業領域を分けて**行う。作業ごとに、`main` から専用のブランチを切り、**本体のリポジトリの外**（本体の隣の `<本体のフォルダ名>-worktrees/<名前>/`。例: `ade-test-worktrees/<名前>/`）に作業領域を作る。リポジトリの中に置かないのは、型チェック・テスト・検索が入れ子の作業領域を拾わないようにするため。置き場所は環境変数 `WT_ROOT` で変えられる
+- 作業領域は、`pnpm run wt create <名前>`（`dev/` で実行）で作る。`<本体>-worktrees/<名前>/`、ブランチ `feature/<名前>`、**専用のテスト用DBとe2e用DB**（`habit_app_test_<名前>`、`habit_app_e2e_<名前>`）、`.env`、`pnpm install` をまとめて用意する。手で作った作業領域には `pnpm run wt env <名前>` を使う。名前は小文字・数字・ハイフンで40文字以内
 - 作業が終わったら、`pnpm run wt remove <名前>` で、作業領域と専用DBを消し、マージ済みならブランチも消す。`pnpm run wt list` で、消し忘れたDB（残骸）を確認できる
 - **アプリのポートも作業領域ごとに分ける**: `wt.sh` が作業領域ごとに「スロット」（1〜99）を割り当て、`.env` に `API_PORT`（3000+n）、`WEB_PORT`（5173+n）、`E2E_API_PORT`（3100+n）、`E2E_WEB_PORT`（5273+n）を書く。本体は n=0（3000 / 5173 / 3100 / 5273）。`start:api`、`start:web`、`e2e` はこの値を使うので、複数の作業領域で同時に起動しても重ならない
 - `.env` はコミット対象外で、接続情報を含む。中身は表示しない。開発用DB（`habit_app_dev`）は全作業領域で共有する
 - コミットは、変更したファイルを指定して追加する（`git add -A` と `git add .` は使わない）。他の作業中のファイルを巻き込まないため
 - 作業が終わったら、`pnpm run verify` が成功してから、`main` にマージし、作業領域とブランチを削除する。マージとプッシュは、ユーザーの指示があるときだけ行う
-- 作業領域から、共有のテスト用DB（`habit_app_test`）とe2e用DB（`habit_app_e2e`）は初期化できない（`db-guard.sh` が中止する）。作業領域では、専用のDBだけを使う
+- 作業領域から、共有のテスト用DB（`habit_app_test`）とe2e用DB（`habit_app_e2e`）は初期化できない（`db-guard.sh` が中止する。作業領域かどうかは、置き場所ではなく git の情報〔`git-dir` と `git-common-dir` の違い〕で判定する）。作業領域では、専用のDBだけを使う
 - テスト用・e2e用のDBに入れるデータは、**テストに必要な最小限**にする（テストの中で作る）。マスタの全件は入れない。マスタが大きくなってセットアップが遅くなったら、投入済みのDBを `CREATE DATABASE ... TEMPLATE` で複製する方式に、`wt.sh` の `create_dbs` を切り替える
 - 並行して実行するエージェントには、別々の作業領域を割り当ててもよい（次の「タスクの並行実行」の、ファイルが重ならない場合の代わりになる）
 
