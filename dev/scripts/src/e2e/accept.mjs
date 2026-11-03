@@ -2,9 +2,9 @@ import { chromium } from 'playwright-core';
 import os from 'node:os';
 import { mkdirSync } from 'node:fs';
 
-// 画面の受入確認（A-01〜A-05、A-07〜A-09、XSS）。APIと画面を起動した状態で実行する: pnpm run e2e
+// 画面の受入確認（A-01〜A-05、A-07〜A-09、XSS）。APIと画面を起動した状態で実行する（単独実行: node accept.mjs）
 // 環境変数: CHROME_PATH（ブラウザの実行ファイル）、BASE_URL、API_URL、OUT_DIR（スクリーンショットの出力先）
-// 注意: 開発用DB（habit_app_dev）の習慣を、最初と最後に全て削除する
+// 注意: 接続先のDBの習慣を、最初と最後に全て削除する。通常は `pnpm run e2e`（e2e専用のDB habit_app_e2e で、API・画面を自動で起動する）で実行する
 // 終了コード: すべての確認が成功なら0、1つでも失敗なら1
 
 // ================================================================

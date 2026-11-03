@@ -42,7 +42,7 @@ pnpm run start:web     # 画面（http://localhost:5173）。/api はAPIへ転�
 | `pnpm run typecheck` | 全ワークスペースの型チェック |
 | `pnpm run test:unit` | 単体テスト（DB不要） |
 | `pnpm run verify` | 型チェック → テストDBの初期化 → すべてのテスト（結合テストを含む） |
-| `pnpm run e2e` | ブラウザでの受入確認（APIと画面を起動した状態で実行。開発用DBの習慣を削除する） |
+| `pnpm run e2e` | ブラウザでの受入確認。e2e専用のDB（`habit_app_e2e`）を初期化し、API・画面を別ポート（3100 / 5273）で自動起動して実行する。開発用DBには触れない |
 
 コミット前（husky）には型チェックと単体テスト、PR・main への push（GitHub Actions）には `verify` と同じ内容が実行されます。ループ（検証と修復の繰り返し）の仕組みは [`docs/loop-engineering.md`](docs/loop-engineering.md) を参照してください。
 

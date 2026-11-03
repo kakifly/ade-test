@@ -2,6 +2,7 @@
 # DDLを順に適用する。
 #   db-apply.sh        : DATABASE_URL（habit_app_dev）に適用
 #   db-apply.sh test   : TEST_DATABASE_URL（habit_app_test）を初期化してから適用
+#   db-apply.sh e2e    : E2E_DATABASE_URL（habit_app_e2e）を初期化してから適用
 set -euo pipefail
 
 # ================================================================
@@ -20,15 +21,18 @@ fi
 
 # ================================================================
 # 2. 適用先DBの決定
-#    dev は DATABASE_URL、test は TEST_DATABASE_URL を使い、test のときは適用前に初期化する
+#    dev は DATABASE_URL、test は TEST_DATABASE_URL、e2e は E2E_DATABASE_URL を使う。
+#    test と e2e のときは、適用前に初期化する
 # ================================================================
 mode="${1:-dev}"
-if [ "$mode" = "test" ]; then
-  url="${TEST_DATABASE_URL:?TEST_DATABASE_URL が未設定です}"
-  # テスト用DBは毎回まっさらにする（publicスキーマの所有者ではないため、このアプリのオブジェクトだけを消す）
+case "$mode" in
+  test) url="${TEST_DATABASE_URL:?TEST_DATABASE_URL が未設定です}" ;;
+  e2e)  url="${E2E_DATABASE_URL:?E2E_DATABASE_URL が未設定です}" ;;
+  *)    url="${DATABASE_URL:?DATABASE_URL が未設定です}" ;;
+esac
+if [ "$mode" = "test" ] || [ "$mode" = "e2e" ]; then
+  # テスト用・e2e用のDBは毎回まっさらにする（publicスキーマの所有者ではないため、このアプリのオブジェクトだけを消す）
   psql "$url" -v ON_ERROR_STOP=1 -q -c 'DROP TABLE IF EXISTS habit_checks, habits CASCADE; DROP FUNCTION IF EXISTS set_row_meta() CASCADE;'
-else
-  url="${DATABASE_URL:?DATABASE_URL が未設定です}"
 fi
 
 # ================================================================

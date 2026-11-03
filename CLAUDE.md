@@ -138,5 +138,5 @@ dev/
 
 - ドキュメント、コミットメッセージ、PR本文は日本語。識別子とブランチ名は英語
 - DBの接続情報は環境変数 `DATABASE_URL` で受け取る。`.env` はコミットしない。パスワードをログや出力、ドキュメントに書かない
-- 開発用は `habit_app_dev`、テスト用は `habit_app_test` を使う。`habit_app` には触れない
+- 開発用は `habit_app_dev`、結合テスト用は `habit_app_test`、画面の受入確認（e2e）用は `habit_app_e2e` を使う（接続情報は `.env` の `DATABASE_URL`、`TEST_DATABASE_URL`、`E2E_DATABASE_URL`）。`habit_app` には触れない
 - コミットは、テストが通る状態で小さく行う（コミット前に型チェックと単体テストが走る）

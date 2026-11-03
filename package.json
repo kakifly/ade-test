@@ -15,7 +15,8 @@
     "db:apply:test": "bash dev/scripts/src/db-apply.sh test",
     "verify": "pnpm run typecheck && pnpm run db:apply:test && bun test",
     "prepare": "husky",
-    "e2e": "node dev/scripts/src/e2e/accept.mjs",
+    "e2e": "bash dev/scripts/src/e2e/run.sh",
+    "db:apply:e2e": "bash dev/scripts/src/db-apply.sh e2e",
     "start:api": "pnpm --filter @habit/api start",
     "build:web": "pnpm --filter @habit/web build",
     "start:web": "pnpm --filter @habit/web start"

@@ -317,3 +317,38 @@ body {
   color: var(--color-text-muted);
   border: var(--border-width) solid var(--color-border);
 }
+
+/* 表（注文表のサンプル） */
+.grid {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-lg);
+}
+.grid th,
+.grid td {
+  padding: var(--space-sm);
+  border: var(--border-width) solid var(--color-border);
+  vertical-align: top;
+  text-align: left;
+}
+.grid th {
+  font-family: var(--font-heading);
+  font-size: var(--text-sm-size);
+  color: var(--color-text-muted);
+}
+.grid__parent {
+  background: var(--color-surface-raised);
+}
+.cell__customer {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+.cell__indent {
+  display: inline-block;
+  width: var(--space-lg);
+}
+.cell__summary {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm-size);
+}
