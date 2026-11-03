@@ -1,7 +1,9 @@
 import type { OrderTableForm } from '@habit/zod'
 import { createColumnHelper, flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
+import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FieldCell } from './FieldCell'
+import { addItem, RemoveItemButton } from './OrderCells'
 
 /** 平坦化した1行（明細1件分。注文の項目は先頭行だけが持つ） */
 type FlatRow = {
@@ -33,102 +35,79 @@ export function FlatOrderTable({ form }: Props) {
   //    注文ごとの明細を横に並べ直し、先頭の行に結合の行数を持たせる。
   // ================================================================
   const orders = useWatch({ control, name: 'orders' })
-  const data: FlatRow[] = orders.flatMap((o, orderIndex) =>
-    o.items.map((_, itemIndex) => ({
-      orderIndex,
-      itemIndex,
-      rowSpan: itemIndex === 0 ? o.items.length : 0,
-    })),
+  //    描画のたびに作り直さないよう、値が変わったときだけ作る。
+  const data = useMemo<FlatRow[]>(
+    () =>
+      orders.flatMap((o, orderIndex) =>
+        o.items.map((_, itemIndex) => ({
+          orderIndex,
+          itemIndex,
+          rowSpan: itemIndex === 0 ? o.items.length : 0,
+        })),
+      ),
+    [orders],
   )
 
   // ================================================================
-  // 2. 行の追加・削除
-  // ================================================================
-  /**
-   * 注文に空の明細を1行足す。
-   *
-   * @param orderIndex 対象の注文の添字
-   */
-  function addItem(orderIndex: number) {
-    const items = getValues(`orders.${orderIndex}.items`)
-    setValue(`orders.${orderIndex}.items`, [...items, { itemName: '', quantity: 1 }])
-  }
-  /**
-   * 注文から明細を1行消す。
-   *
-   * @param orderIndex 対象の注文の添字
-   * @param itemIndex 消す明細の添字
-   */
-  function removeItem(orderIndex: number, itemIndex: number) {
-    const items = getValues(`orders.${orderIndex}.items`)
-    setValue(
-      `orders.${orderIndex}.items`,
-      items.filter((_, i) => i !== itemIndex),
-    )
-  }
-
-  // ================================================================
-  // 3. 列の定義
+  // 2. 列の定義
   //    顧客と「明細を追加」は、先頭行だけがセルを出す（rowSpan は描画側で付ける）。
+  //    列を毎回作り直すと入力欄が作り直されてフォーカスが外れるので、useMemo で固定する。
   // ================================================================
-  const columns = [
-    helper.display({
-      id: 'customer',
-      header: '顧客',
-      cell: ({ row }) => (
-        <FieldCell control={control} name={`orders.${row.original.orderIndex}.customer`} label="顧客" />
-      ),
-    }),
-    helper.display({
-      id: 'itemName',
-      header: '品名',
-      cell: ({ row }) => (
-        <FieldCell
-          control={control}
-          name={`orders.${row.original.orderIndex}.items.${row.original.itemIndex}.itemName`}
-          label="品名"
-        />
-      ),
-    }),
-    helper.display({
-      id: 'quantity',
-      header: '数量',
-      cell: ({ row }) => (
-        <FieldCell
-          control={control}
-          name={`orders.${row.original.orderIndex}.items.${row.original.itemIndex}.quantity`}
-          type="number"
-          label="数量"
-        />
-      ),
-    }),
-    helper.display({
-      id: 'itemActions',
-      header: '',
-      cell: ({ row }) => {
-        const count = orders[row.original.orderIndex]?.items.length ?? 0
-        return (
-          <button
-            type="button"
-            className="btn btn--destructive btn--sm"
-            disabled={count <= 1}
-            onClick={() => removeItem(row.original.orderIndex, row.original.itemIndex)}
-          >
-            削除
+  const columns = useMemo(
+    () => [
+      helper.display({
+        id: 'customer',
+        header: '顧客',
+        cell: ({ row }) => <FieldCell control={control} name={`orders.${row.original.orderIndex}.customer`} label="顧客" />,
+      }),
+      helper.display({
+        id: 'itemName',
+        header: '品名',
+        cell: ({ row }) => (
+          <FieldCell
+            control={control}
+            name={`orders.${row.original.orderIndex}.items.${row.original.itemIndex}.itemName`}
+            label="品名"
+          />
+        ),
+      }),
+      helper.display({
+        id: 'quantity',
+        header: '数量',
+        cell: ({ row }) => (
+          <FieldCell
+            control={control}
+            name={`orders.${row.original.orderIndex}.items.${row.original.itemIndex}.quantity`}
+            type="number"
+            label="数量"
+          />
+        ),
+      }),
+      helper.display({
+        id: 'itemActions',
+        header: '',
+        cell: ({ row }) => (
+          <RemoveItemButton
+            control={control}
+            orderIndex={row.original.orderIndex}
+            itemIndex={row.original.itemIndex}
+            getValues={getValues}
+            setValue={setValue}
+          />
+        ),
+      }),
+      helper.display({
+        id: 'orderActions',
+        header: '',
+        cell: ({ row }) => (
+          <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(getValues, setValue, row.original.orderIndex)}>
+            明細を追加
           </button>
-        )
-      },
-    }),
-    helper.display({
-      id: 'orderActions',
-      header: '',
-      cell: ({ row }) => (
-        <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(row.original.orderIndex)}>
-          明細を追加
-        </button>
-      ),
-    }),
-  ]
+        ),
+      }),
+    ],
+    [control, getValues, setValue],
+  )
 
   // 結合するのは、注文単位の列（顧客・明細追加）だけ
   const mergedColumns = new Set(['customer', 'orderActions'])
