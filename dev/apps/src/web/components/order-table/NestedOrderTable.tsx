@@ -8,6 +8,8 @@ import {
 } from '@tanstack/react-table'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FieldCell } from './FieldCell'
+import { Button } from '../../ui/Button'
+import { TABLE } from '../../ui/table'
 
 /** 親行（注文）。子行として明細を持つ */
 type OrderRow = {
@@ -67,18 +69,18 @@ export function NestedOrderTable({ form }: Props) {
       cell: ({ row }) => {
         const r = row.original
         // 子行は顧客欄を空ける（インデントで親子を示す）
-        if (r.kind === 'item') return <span className="cell__indent" />
+        if (r.kind === 'item') return <span className="inline-block w-6" />
         return (
-          <div className="cell__customer">
-            <button
-              type="button"
-              className="btn btn--sm cell__toggle"
+          <div className="flex items-start gap-2">
+            <Button
+              variant="plain"
+              size="sm"
               aria-expanded={row.getIsExpanded()}
               aria-label={`${r.customer || '注文'}の明細を${row.getIsExpanded() ? '閉じる' : '開く'}`}
               onClick={row.getToggleExpandedHandler()}
             >
               {row.getIsExpanded() ? '▼' : '▶'}
-            </button>
+            </Button>
             <FieldCell control={control} name={`orders.${r.orderIndex}.customer`} label="顧客" />
           </div>
         )
@@ -90,7 +92,7 @@ export function NestedOrderTable({ form }: Props) {
       cell: ({ row }) => {
         const r = row.original
         // 親行は明細の件数だけを出す
-        if (r.kind === 'order') return <span className="cell__summary">{r.children.length}件の明細</span>
+        if (r.kind === 'order') return <span className="text-sm text-text-muted">{r.children.length}件の明細</span>
         return <FieldCell control={control} name={`orders.${r.orderIndex}.items.${r.itemIndex}.itemName`} label="品名" />
       },
     }),
@@ -102,7 +104,7 @@ export function NestedOrderTable({ form }: Props) {
         // 親行は数量の合計を出す
         if (r.kind === 'order') {
           const total = (orders[r.orderIndex]?.items ?? []).reduce((sum, i) => sum + (Number.isNaN(i.quantity) ? 0 : i.quantity), 0)
-          return <span className="cell__summary">合計 {total}</span>
+          return <span className="text-sm text-text-muted">合計 {total}</span>
         }
         return (
           <FieldCell
@@ -122,21 +124,21 @@ export function NestedOrderTable({ form }: Props) {
         // 親行は明細の追加、子行は明細の削除（最後の1件は削除できない）
         if (r.kind === 'order') {
           return (
-            <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(r.orderIndex)}>
+            <Button size="sm" onClick={() => addItem(r.orderIndex)}>
               明細を追加
-            </button>
+            </Button>
           )
         }
         const count = orders[r.orderIndex]?.items.length ?? 0
         return (
-          <button
-            type="button"
-            className="btn btn--destructive btn--sm"
+          <Button
+            variant="destructive"
+            size="sm"
             disabled={count <= 1}
             onClick={() => removeItem(r.orderIndex, r.itemIndex)}
           >
             削除
-          </button>
+          </Button>
         )
       },
     }),
@@ -183,21 +185,21 @@ export function NestedOrderTable({ form }: Props) {
   })
 
   return (
-    <table className="grid">
+    <table className={TABLE.table}>
       <thead>
         {table.getHeaderGroups().map((g) => (
           <tr key={g.id}>
             {g.headers.map((h) => (
-              <th key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
+              <th key={h.id} className={TABLE.th}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
             ))}
           </tr>
         ))}
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className={row.depth === 0 ? 'grid__parent' : 'grid__child'}>
+          <tr key={row.id} className={row.depth === 0 ? TABLE.parentRow : undefined}>
             {row.getVisibleCells().map((c) => (
-              <td key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
+              <td key={c.id} className={TABLE.td}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
             ))}
           </tr>
         ))}

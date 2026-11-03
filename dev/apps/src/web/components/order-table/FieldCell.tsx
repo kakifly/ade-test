@@ -1,5 +1,7 @@
 import type { OrderTableForm } from '@habit/zod'
 import { useController, type Control, type FieldPath } from 'react-hook-form'
+import { FieldError } from '../../ui/FieldError'
+import { Input } from '../../ui/Input'
 
 /** FieldCell の props */
 type Props = {
@@ -31,9 +33,9 @@ export function FieldCell({ control, name, type = 'text', label }: Props) {
   //    数値セルは、空欄を NaN にして「数量を入力してください」の検証に流す。
   // ================================================================
   return (
-    <div className="cell">
-      <input
-        className={error ? 'input input--error' : 'input'}
+    <div>
+      <Input
+        invalid={Boolean(error)}
         type={type}
         aria-label={label}
         aria-invalid={error ? true : undefined}
@@ -44,9 +46,7 @@ export function FieldCell({ control, name, type = 'text', label }: Props) {
         onChange={(e) => field.onChange(type === 'number' ? e.target.valueAsNumber : e.target.value)}
       />
       {error && (
-        <p className="field__error" role="alert">
-          {error.message}
-        </p>
+        <FieldError>{error.message}</FieldError>
       )}
     </div>
   )

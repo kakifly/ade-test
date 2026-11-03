@@ -20,10 +20,10 @@ type Props = {
 export function HabitList({ habits, busy, onToggle, onDelete }: Props) {
   // 習慣が無いときは案内を出す
   if (habits.length === 0) {
-    return <p className="empty">最初の習慣を登録しよう</p>
+    return <p className="m-0 text-center text-text-muted">最初の習慣を登録しよう</p>
   }
   return (
-    <ul className="list">
+    <ul className="m-0 list-none p-0">
       {habits.map((h) => (
         <HabitRow key={h.id} habit={h} busy={busy} onToggle={onToggle} onDelete={onDelete} />
       ))}

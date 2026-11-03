@@ -1,5 +1,7 @@
 import type { HabitResponse } from '@habit/zod'
 import { StreakChip } from './StreakChip'
+import { Button } from '../ui/Button'
+import { Checkbox } from '../ui/Checkbox'
 
 /** HabitRow の props */
 type Props = {
@@ -18,21 +20,17 @@ type Props = {
  */
 export function HabitRow({ habit, busy, onToggle, onDelete }: Props) {
   return (
-    <li className="list-row">
-      <label className="checkbox">
-        <input
-          type="checkbox"
-          checked={habit.checkedToday}
-          disabled={busy}
-          onChange={(e) => onToggle(habit, e.target.checked)}
-        />
+    <li data-testid="habit-row" className="flex min-h-(--size-list-row) items-center gap-4 border-b border-surface-raised px-4 py-2 last:border-b-0 hover:bg-surface-raised">
+      <Checkbox checked={habit.checkedToday} disabled={busy} onChange={(e) => onToggle(habit, e.target.checked)}>
         {/* 習慣名は文字列として描画する（HTMLとして解釈しない） */}
-        <span className="list-row__label">{habit.name}</span>
-      </label>
+        <span data-testid="habit-label" className="wrap-anywhere text-text">
+          {habit.name}
+        </span>
+      </Checkbox>
       <StreakChip streak={habit.streak} />
-      <button type="button" className="btn btn--destructive btn--sm" disabled={busy} onClick={() => onDelete(habit)}>
+      <Button variant="destructive" size="sm" disabled={busy} onClick={() => onDelete(habit)}>
         削除
-      </button>
+      </Button>
     </li>
   )
 }
