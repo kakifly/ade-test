@@ -45,9 +45,9 @@ page.on('pageerror', (e) => consoleErrors.push('pageerror: ' + e.message));
 /** 習慣名を入力して「追加」を押す。 */
 const add = async (p, name) => { await p.fill('#habit-name', name); await p.click('button:has-text("追加")'); };
 /** 習慣の行（一覧のli）全体を返す。 */
-const rows = (p) => p.locator('li.list-row');
+const rows = (p) => p.locator('[data-testid=habit-row]');
 /** 指定した習慣名を含む行を返す。 */
-const row = (p, name) => p.locator('li.list-row', { hasText: name });
+const row = (p, name) => p.locator('[data-testid=habit-row]', { hasText: name });
 /** 指定ミリ秒だけ待つ（画面の更新待ち）。 */
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -85,7 +85,7 @@ await page.screenshot({ path: `${SP}/a02-error.png` });
 //    チェックで連続日数が1日になり、解除で0日に戻ることを確認する
 // ================================================================
 /** 指定した習慣の連続日数の表示要素を返す。 */
-const chip = (p, n) => row(p, n).locator('.chip');
+const chip = (p, n) => row(p, n).locator('[data-testid=streak-chip]');
 await row(page, '朝のストレッチ').locator('input[type=checkbox]').click(); await wait(600);
 const s1 = await chip(page, '朝のストレッチ').textContent();
 await row(page, '朝のストレッチ').locator('input[type=checkbox]').click(); await wait(600);
@@ -97,7 +97,7 @@ rec('A-03', s1 === '1日' && s0 === '0日', `チェック後=${s1} 解除後=${s
 //    チェックしてから再読み込みし、チェック状態と件数が保たれることを確認する
 // ================================================================
 await row(page, '朝のストレッチ').locator('input[type=checkbox]').click(); await wait(600);
-await page.reload(); await page.waitForSelector('li.list-row');
+await page.reload(); await page.waitForSelector('[data-testid=habit-row]');
 const kept = await row(page, '朝のストレッチ').locator('input[type=checkbox]').isChecked();
 const keptChip = await chip(page, '朝のストレッチ').textContent();
 rec('A-04', kept && keptChip === '1日' && (await rows(page).count()) === 2, `再読み込み後 checked=${kept} ${keptChip}`);
@@ -117,7 +117,7 @@ rec('A-05', gone && re === '0日', `削除後に消えた=${gone} 再登録=${re
 // 10. A-09 2つのタブでの競合
 //    古い状態のタブから操作して、409時のメッセージ表示と、望む状態にすでになっている場合の成功扱いを確認する
 // ================================================================
-const p2 = await ctx.newPage(); await p2.goto(BASE); await p2.waitForSelector('li.list-row');
+const p2 = await ctx.newPage(); await p2.goto(BASE); await p2.waitForSelector('[data-testid=habit-row]');
 const n = '読書';
 // 準備: p2 は古い状態（未チェック, v）を保持。p1 がチェック→解除して最新にする
 await row(page, n).locator('input[type=checkbox]').click(); await wait(500);
@@ -129,7 +129,7 @@ const p2checked = await row(p2, n).locator('input[type=checkbox]').isChecked();
 rec('A-09(メッセージ)', alertTxt.some((t) => t.trim().length > 0) && !p2checked, `alert=${JSON.stringify(alertTxt)} p2checked=${p2checked}`);
 await p2.screenshot({ path: `${SP}/a09-conflict.png` });
 // 望む状態にすでになっている場合は成功扱い: p1 がチェック → p2(古い: 未チェック)がチェック
-await p2.reload(); await p2.waitForSelector('li.list-row');
+await p2.reload(); await p2.waitForSelector('[data-testid=habit-row]');
 await row(page, n).locator('input[type=checkbox]').click(); await wait(500);
 await row(p2, n).locator('input[type=checkbox]').click(); await wait(800);
 const p2alerts = (await p2.locator('[role=alert]').allTextContents()).filter((t) => t.trim());
@@ -145,7 +145,7 @@ await row(page, n).locator('input[type=checkbox]').click().catch(() => {}); awai
 const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
 const p3 = await ctx.newPage();
 await p3.clock.install({ time: tomorrow });
-await p3.goto(BASE); await p3.waitForSelector('li.list-row');
+await p3.goto(BASE); await p3.waitForSelector('[data-testid=habit-row]');
 await row(p3, n).locator('input[type=checkbox]').click(); await wait(800);
 const pad = (x) => String(x).padStart(2, '0');
 const ld = `${tomorrow.getFullYear()}-${pad(tomorrow.getMonth() + 1)}-${pad(tomorrow.getDate())}`;
@@ -161,8 +161,8 @@ await p3.close();
 //    script タグを含む習慣名が、文字列として表示され、要素として実行されないことを確認する
 // ================================================================
 await add(page, '<script>alert(1)</script>'); await wait(600);
-const scriptEls = await page.locator('li.list-row script').count();
-const txt = await row(page, '<script>').locator('.list-row__label').textContent().catch(() => null);
+const scriptEls = await page.locator('[data-testid=habit-row] script').count();
+const txt = await row(page, '<script>').locator('[data-testid=habit-label]').textContent().catch(() => null);
 rec('N-05(XSS)', scriptEls === 0 && txt === '<script>alert(1)</script>', `script要素=${scriptEls} 表示="${txt}"`);
 
 // ================================================================

@@ -10,6 +10,8 @@ import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FieldCell } from './FieldCell'
 import { addItem, ItemCount, OrderTotal, RemoveItemButton } from './OrderCells'
+import { Button } from '../../ui/Button'
+import { TABLE } from '../../ui/table'
 
 /** 親行（注文）。子行として明細を持つ */
 type OrderRow = {
@@ -77,18 +79,18 @@ export function NestedOrderTable({ form }: Props) {
         cell: ({ row }) => {
           const r = row.original
           // 子行は顧客欄を空ける（インデントで親子を示す）
-          if (r.kind === 'item') return <span className="cell__indent" />
+          if (r.kind === 'item') return <span className="inline-block w-6" />
           return (
-            <div className="cell__customer">
-              <button
-                type="button"
-                className="btn btn--sm cell__toggle"
+            <div className="flex items-start gap-2">
+              <Button
+                variant="plain"
+                size="sm"
                 aria-expanded={row.getIsExpanded()}
                 aria-label={`注文${r.orderIndex + 1}の明細を${row.getIsExpanded() ? '閉じる' : '開く'}`}
                 onClick={row.getToggleExpandedHandler()}
               >
                 {row.getIsExpanded() ? '▼' : '▶'}
-              </button>
+              </Button>
               <FieldCell control={control} name={`orders.${r.orderIndex}.customer`} label="顧客" />
             </div>
           )
@@ -129,9 +131,9 @@ export function NestedOrderTable({ form }: Props) {
           // 親行は明細の追加、子行は明細の削除
           if (r.kind === 'order') {
             return (
-              <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(getValues, setValue, r.orderIndex)}>
+              <Button size="sm" onClick={() => addItem(getValues, setValue, r.orderIndex)}>
                 明細を追加
-              </button>
+              </Button>
             )
           }
           return (
@@ -165,21 +167,21 @@ export function NestedOrderTable({ form }: Props) {
   })
 
   return (
-    <table className="grid">
+    <table className={TABLE.table}>
       <thead>
         {table.getHeaderGroups().map((g) => (
           <tr key={g.id}>
             {g.headers.map((h) => (
-              <th key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
+              <th key={h.id} className={TABLE.th}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
             ))}
           </tr>
         ))}
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className={row.depth === 0 ? 'grid__parent' : 'grid__child'}>
+          <tr key={row.id} className={row.depth === 0 ? TABLE.parentRow : undefined}>
             {row.getVisibleCells().map((c) => (
-              <td key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
+              <td key={c.id} className={TABLE.td}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
             ))}
           </tr>
         ))}

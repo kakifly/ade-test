@@ -61,7 +61,7 @@ dev/                           package.json、pnpm-workspace.yaml、tsconfig な
 
 - TypeScript、Bun（実行、バンドル、テスト `bun test`）、pnpm（パッケージ管理。ワークスペースのモノレポ。定義は `pnpm-workspace.yaml`、ロックファイルは `pnpm-lock.yaml`）
 - 依存の追加は `pnpm add`（`bun add` / `bun install` は使わない）。`workspace:*` でパッケージ間を参照する
-- `dev/apps/src/web`: React + React Hook Form
+- `dev/apps/src/web`: React + React Hook Form + Tailwind CSS v4（CSSフレームワーク。`tokens.css` を `app.css` にビルドして読み込む。`app.css` は生成物でコミットしない）
 - `dev/apps/src/api`: NestJS + Drizzle ORM + PostgreSQL
 - `dev/share/src/zod`: 項目ごとのzodスキーマ。画面・APIのスキーマは、これらを組み合わせて作る
 - `dev/share/src/core`: ストリーク計算などの純粋関数
@@ -95,7 +95,11 @@ dev/                           package.json、pnpm-workspace.yaml、tsconfig な
 ## UIデザインのルール
 
 - UIの見た目（色、フォント、余白、角丸、影、各部品のスタイル）は、リポジトリ直下の `DESIGN.md`（QuestUI デザインシステム）を参考にして決める
-- `DESIGN.md` にある値（カラーコード、サイズなど）は、CSSの変数（デザイントークン）として一箇所に定義し、各部品はそれを参照する。値を各所に直接書かない
+- `DESIGN.md` にある値（カラーコード、サイズなど）は、`dev/apps/src/web/tokens.css` の `@theme` に、CSSの変数（デザイントークン）として一箇所に定義する。各部品は、そのトークンのTailwindユーティリティ（`bg-primary`、`text-h1`、`rounded-md` など）か `var()` で参照する。値を各所に直接書かない
+  - `@theme` は `--color-*: initial` などで、Tailwind 標準の色・フォント・大きさを消している。`DESIGN.md` に無い値は、使えない
+  - 任意値（`bg-[#fff]`、`p-[13px]`）は、値を直接書くことになるので使わない。寸法は `--size-*` を定義して `h-(--size-input-height)` のように参照する
+  - 繰り返す見た目は、`dev/apps/src/web/ui/`（`Button`、`Input`、`Card`、`Chip`、`Checkbox`、`Page`、`FieldError`、`table.ts`）の部品にまとめる。画面のコンポーネントでは、長いクラス名を並べず、この部品を使う
+  - e2e とテストは、クラス名ではなく `data-testid`（`habit-row`、`habit-label`、`streak-chip`）で要素を探す。見た目のクラスを変えても壊れないようにするため
 - `DESIGN.md` に無い部品を作るときは、近い部品の規則に合わせ、独自の色やフォントを足さない
 - `DESIGN.md` の「やるべきこと・避けること」に従う（例: 純粋な黒や真っ白を使わない、サンセリフ体を混ぜない）
 - `DESIGN.md` と実装が食い違う場合は、`DESIGN.md` を正とする。デザインを変えたいときは、先に `DESIGN.md` を直す

@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { createHabitFormSchema, type CreateHabitForm } from '@habit/zod'
 import { useForm } from 'react-hook-form'
+import { Button } from '../ui/Button'
+import { FieldError } from '../ui/FieldError'
+import { Input } from '../ui/Input'
 
 /** HabitForm の props */
 type Props = {
@@ -49,15 +52,15 @@ export function HabitForm({ onSubmit, disabled = false }: Props) {
   // ================================================================
   const error = errors.name?.message
   return (
-    <form className="form" onSubmit={submit} noValidate>
-      <div className="form__row">
-        <div className="field">
-          <label className="field__label" htmlFor="habit-name">
+    <form onSubmit={submit} noValidate>
+      <div className="flex items-end gap-2">
+        <div className="flex-1">
+          <label className="mb-1.5 block text-sm font-medium text-text" htmlFor="habit-name">
             習慣名
           </label>
-          <input
+          <Input
             id="habit-name"
-            className={error ? 'input input--error' : 'input'}
+            invalid={Boolean(error)}
             placeholder="習慣名を入力"
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? 'habit-name-error' : undefined}
@@ -65,14 +68,12 @@ export function HabitForm({ onSubmit, disabled = false }: Props) {
             {...register('name')}
           />
         </div>
-        <button type="submit" className="btn btn--primary btn--md" disabled={disabled}>
+        <Button type="submit" disabled={disabled}>
           追加
-        </button>
+        </Button>
       </div>
       {error && (
-        <p id="habit-name-error" className="field__error" role="alert">
-          {error}
-        </p>
+        <FieldError id="habit-name-error">{error}</FieldError>
       )}
     </form>
   )

@@ -5,6 +5,8 @@ import { ApiError, createApiClient, type ApiClient } from './api'
 import { HabitForm } from './components/HabitForm'
 import { HabitList } from './components/HabitList'
 import { resolveToggleConflict } from './conflict'
+import { Card } from './ui/Card'
+import { Page } from './ui/Page'
 
 /**
  * 例外を、利用者に見せるエラー文に変える。
@@ -172,17 +174,16 @@ export function App({ client: injected }: Props) {
   }
 
   return (
-    <main className="page">
-      <h1 className="page__title">今日の習慣チェック</h1>
+    <Page title="今日の習慣チェック">
       <HabitForm onSubmit={create} disabled={busy} />
       {error && (
-        <div className="card card--error" role="alert">
+        <Card variant="error" role="alert">
           {error}
-        </div>
+        </Card>
       )}
-      <section className="card card--accent">
+      <Card as="section" variant="accent">
         <HabitList habits={habits} busy={busy} onToggle={toggle} onDelete={remove} />
-      </section>
-    </main>
+      </Card>
+    </Page>
   )
 }

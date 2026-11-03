@@ -4,6 +4,8 @@ import { useMemo } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import { FieldCell } from './FieldCell'
 import { addItem, RemoveItemButton } from './OrderCells'
+import { Button } from '../../ui/Button'
+import { TABLE } from '../../ui/table'
 
 /** 平坦化した1行（明細1件分。注文の項目は先頭行だけが持つ） */
 type FlatRow = {
@@ -100,9 +102,9 @@ export function FlatOrderTable({ form }: Props) {
         id: 'orderActions',
         header: '',
         cell: ({ row }) => (
-          <button type="button" className="btn btn--primary btn--sm" onClick={() => addItem(getValues, setValue, row.original.orderIndex)}>
+          <Button size="sm" onClick={() => addItem(getValues, setValue, row.original.orderIndex)}>
             明細を追加
-          </button>
+          </Button>
         ),
       }),
     ],
@@ -114,30 +116,30 @@ export function FlatOrderTable({ form }: Props) {
   const table = useReactTable({ data, columns, getCoreRowModel: getCoreRowModel() })
 
   return (
-    <table className="grid">
+    <table className={TABLE.table}>
       <thead>
         {table.getHeaderGroups().map((g) => (
           <tr key={g.id}>
             {g.headers.map((h) => (
-              <th key={h.id}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
+              <th key={h.id} className={TABLE.th}>{flexRender(h.column.columnDef.header, h.getContext())}</th>
             ))}
           </tr>
         ))}
       </thead>
       <tbody>
         {table.getRowModel().rows.map((row) => (
-          <tr key={row.id} className={row.original.itemIndex === 0 ? 'grid__parent' : 'grid__child'}>
+          <tr key={row.id} className={row.original.itemIndex === 0 ? TABLE.parentRow : undefined}>
             {row.getVisibleCells().map((c) => {
               // 結合列は、先頭行だけ rowSpan 付きで出し、残りの行ではセルを出さない
               if (mergedColumns.has(c.column.id)) {
                 if (row.original.rowSpan === 0) return null
                 return (
-                  <td key={c.id} rowSpan={row.original.rowSpan}>
+                  <td key={c.id} rowSpan={row.original.rowSpan} className={TABLE.td}>
                     {flexRender(c.column.columnDef.cell, c.getContext())}
                   </td>
                 )
               }
-              return <td key={c.id}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
+              return <td key={c.id} className={TABLE.td}>{flexRender(c.column.columnDef.cell, c.getContext())}</td>
             })}
           </tr>
         ))}

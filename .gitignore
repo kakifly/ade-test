@@ -5,3 +5,4 @@
 dist/
 node_modules/
 .claude/loop/
+dev/apps/src/web/app.css

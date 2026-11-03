@@ -1,5 +1,19 @@
-/* QuestUI（DESIGN.md）のデザイントークン。値はここだけに定義し、各部品は var() で参照する */
-:root {
+/*
+ * QuestUI（DESIGN.md）のデザイントークン。値はここだけに定義する。
+ * Tailwind CSS の @theme に書くと、CSS変数（--color-primary など）として出力され、
+ * 同時にユーティリティ（bg-primary、text-h1、rounded-md など）が使えるようになる。
+ * 各部品は、ここで定義したトークンのユーティリティ（または var()）だけを使い、値を直接書かない。
+ */
+@import 'tailwindcss';
+
+/* 出力するのは、ここで定義したトークンだけにする（DESIGN.md に無い色・フォントを使えないようにする） */
+@theme static {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --shadow-*: initial;
+  --radius-*: initial;
+
   /* カラー */
   --color-primary: #ca8a04;
   --color-primary-hover: #b8780a;
@@ -34,321 +48,53 @@
   --font-body: 'Spectral', serif;
   --font-mono: 'Fira Code', monospace;
 
-  /* タイポグラフィ */
-  --text-h1-size: 32px;
-  --text-h1-line: 1.2;
-  --text-h1-weight: 700;
-  --text-body-size: 16px;
-  --text-body-line: 1.7;
-  --text-sm-size: 14px;
-  --text-sm-line: 1.6;
-  --text-caption-size: 12px;
-  --text-caption-line: 1.4;
-  --text-chip-size: 11px;
-  --text-btn-sm-size: 13px;
-  --text-btn-md-size: 14px;
+  /* タイポグラフィ（text-<名前> で、文字の大きさ・行の高さ・太さがまとめて決まる） */
+  --text-h1: 32px;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 700;
+  --text-body: 16px;
+  --text-body--line-height: 1.7;
+  --text-sm: 14px;
+  --text-sm--line-height: 1.6;
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-chip: 11px;
+  --text-btn-sm: 13px;
+  --text-btn-md: 14px;
 
-  /* スペーシング */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  --space-3xl: 64px;
-  --space-label-gap: 6px;
-  --space-icon-gap: 12px;
+  /* スペーシング（p-4 などの数字は、この単位の倍数。1 = 4px。xs=1、sm=2、md=4、lg=6、xl=8、2xl=12、3xl=16） */
+  --spacing: 4px;
 
   /* 角丸 */
   --radius-sm: 2px;
-  --radius: 4px;
+  --radius-md: 4px;
 
   /* 影 */
-  --shadow-sm: 0 1px 3px var(--color-primary-a25);
-  --shadow: 0 2px 8px var(--color-primary-a25);
+  --shadow-card: 0 1px 3px var(--color-primary-a25);
+  --shadow-raised: 0 2px 8px var(--color-primary-a25);
   --shadow-glow: 0 0 20px var(--color-primary-a25);
   --shadow-focus: 0 0 0 3px var(--color-primary-ring);
   --shadow-error: 0 0 0 3px var(--color-error-ring);
 
-  /* 部品の寸法 */
+  /* 部品の寸法（h-(--size-input-height) のように、ユーティリティから参照する） */
   --size-input-height: 40px;
   --size-btn-sm-height: 32px;
   --size-btn-md-height: 40px;
   --size-list-row: 48px;
   --size-checkbox: 20px;
   --size-page-width: 640px;
-  --border-width: 1px;
-  --border-width-strong: 2px;
   --opacity-disabled: 0.35;
   --duration: 300ms;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-body);
-  font-size: var(--text-body-size);
-  line-height: var(--text-body-line);
-}
-
-/* ページ */
-.page {
-  max-width: var(--size-page-width);
-  margin: 0 auto;
-  padding: var(--space-3xl) var(--space-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-.page__title {
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: var(--text-h1-size);
-  line-height: var(--text-h1-line);
-  font-weight: var(--text-h1-weight);
-  color: var(--color-text);
-}
-
-/* カード */
-.card {
-  background: var(--color-surface);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-lg);
-}
-.card--accent {
-  border-top: var(--border-width-strong) solid var(--color-primary);
-  box-shadow: var(--shadow);
-}
-.card--error {
-  border-color: var(--color-error);
-  box-shadow: var(--shadow-error);
-  color: var(--color-error-text);
-}
-
-/* 入力欄 */
-.form__row {
-  display: flex;
-  align-items: flex-end;
-  gap: var(--space-sm);
-}
-.field {
-  flex: 1;
-}
-.field__label {
-  display: block;
-  margin-bottom: var(--space-label-gap);
-  font-size: var(--text-sm-size);
-  font-weight: 500;
-  color: var(--color-text);
-}
-.field__error {
-  margin: var(--space-xs) 0 0;
-  font-size: var(--text-caption-size);
-  color: var(--color-error-text);
-}
-.input {
-  width: 100%;
-  height: var(--size-input-height);
-  padding: var(--space-sm) var(--space-icon-gap);
-  background: var(--color-surface);
-  color: var(--color-text);
-  border: var(--border-width) solid var(--color-border);
-  border-radius: var(--radius);
-  font-family: var(--font-body);
-  font-size: var(--text-body-size);
-}
-.input:hover {
-  border-color: var(--color-primary);
-}
-.input:focus {
-  outline: none;
-  border: var(--border-width-strong) solid var(--color-primary);
-  box-shadow: var(--shadow-focus);
-}
-.input--error,
-.input--error:hover,
-.input--error:focus {
-  border: var(--border-width-strong) solid var(--color-error);
-  box-shadow: var(--shadow-error);
-}
-.input:disabled {
-  background: var(--color-bg);
-  border-color: var(--color-surface-raised);
-  box-shadow: none;
-}
-
-/* ボタン */
-.btn {
-  font-family: var(--font-heading);
-  border-radius: var(--radius);
-  cursor: pointer;
-  transition: background var(--duration);
-}
-.btn--sm {
-  height: var(--size-btn-sm-height);
-  padding: 6px 14px;
-  font-size: var(--text-btn-sm-size);
-}
-.btn--md {
-  height: var(--size-btn-md-height);
-  padding: var(--space-sm) 22px;
-  font-size: var(--text-btn-md-size);
-}
-.btn--primary {
-  background: var(--color-primary);
-  color: var(--color-bg);
-  border: var(--border-width) solid var(--color-primary-border);
-  box-shadow: var(--shadow-sm);
-}
-.btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-.btn--destructive {
-  background: var(--color-secondary);
-  color: var(--color-text);
-  border: var(--border-width) solid var(--color-secondary-border);
-}
-.btn--destructive:hover:not(:disabled) {
-  background: var(--color-secondary-hover);
-}
-.btn:disabled {
-  opacity: var(--opacity-disabled);
-  cursor: not-allowed;
-  box-shadow: none;
-  border-color: var(--color-border);
-}
-
-/* リスト */
-.list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.list-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  min-height: var(--size-list-row);
-  padding: var(--space-sm) var(--space-md);
-  border-bottom: var(--border-width) solid var(--color-surface-raised);
-}
-.list-row:last-child {
-  border-bottom: none;
-}
-.list-row:hover {
-  background: var(--color-surface-raised);
-}
-.list-row__label {
-  color: var(--color-text);
-  overflow-wrap: anywhere;
-}
-.empty {
-  margin: 0;
-  text-align: center;
-  color: var(--color-text-muted);
-}
-
-/* チェックボックス */
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  flex: 1;
-  cursor: pointer;
-}
-.checkbox input {
-  appearance: none;
-  flex: none;
-  width: var(--size-checkbox);
-  height: var(--size-checkbox);
-  margin: 0;
-  display: grid;
-  place-content: center;
-  background: var(--color-surface);
-  border: var(--border-width-strong) solid var(--color-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-.checkbox input:checked {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-glow);
-}
-.checkbox input:checked::after {
-  content: '';
-  width: 5px;
-  height: 10px;
-  margin-bottom: 2px;
-  border: solid var(--color-bg);
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-.checkbox input:disabled {
-  opacity: var(--opacity-disabled);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-/* チップ */
-.chip {
-  padding: var(--space-xs) var(--space-icon-gap);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-heading);
-  font-size: var(--text-chip-size);
-  font-weight: 400;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-.chip--success {
-  background: var(--color-success-a12);
-  color: var(--color-success);
-}
-.chip--filter {
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-  border: var(--border-width) solid var(--color-border);
-}
-
-/* 表（注文表のサンプル） */
-.grid {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: var(--space-lg);
-}
-.grid th,
-.grid td {
-  padding: var(--space-sm);
-  border: var(--border-width) solid var(--color-border);
-  vertical-align: top;
-  text-align: left;
-}
-.grid th {
-  font-family: var(--font-heading);
-  font-size: var(--text-sm-size);
-  color: var(--color-text-muted);
-}
-.grid__parent {
-  background: var(--color-surface-raised);
-}
-.cell__customer {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-sm);
-}
-.cell__indent {
-  display: inline-block;
-  width: var(--space-lg);
-}
-.cell__summary {
-  color: var(--color-text-muted);
-  font-size: var(--text-sm-size);
+/* ページ全体の地の色・文字・フォント（body に一度だけ設定する） */
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
 }

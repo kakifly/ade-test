@@ -1,3 +1,4 @@
+import { Chip } from '../ui/Chip'
 /** StreakChip の props */
 type Props = {
   /** 連続日数 */
@@ -9,6 +10,10 @@ type Props = {
  */
 export function StreakChip({ streak }: Props) {
   // 0日のときは目立たせない
-  const variant = streak > 0 ? 'chip chip--success' : 'chip chip--filter'
-  return <span className={variant}>{streak}日</span>
+  const variant = streak > 0 ? 'success' : 'filter'
+  return (
+    <Chip variant={variant} data-testid="streak-chip">
+      {streak}日
+    </Chip>
+  )
 }

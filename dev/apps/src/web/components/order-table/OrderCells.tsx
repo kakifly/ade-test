@@ -1,5 +1,6 @@
 import type { OrderTableForm } from '@habit/zod'
 import { useWatch, type Control, type UseFormGetValues, type UseFormSetValue } from 'react-hook-form'
+import { Button } from '../../ui/Button'
 
 /**
  * 注文に空の明細を1行足す。
@@ -49,13 +50,13 @@ type CellProps = {
 export function OrderTotal({ control, orderIndex }: CellProps) {
   const items = useWatch({ control, name: `orders.${orderIndex}.items` }) ?? []
   const total = items.reduce((sum, i) => sum + (Number.isNaN(i.quantity) ? 0 : i.quantity), 0)
-  return <span className="cell__summary">合計 {total}</span>
+  return <span className="text-sm text-text-muted">合計 {total}</span>
 }
 
 /** 明細の件数を表示する */
 export function ItemCount({ control, orderIndex }: CellProps) {
   const items = useWatch({ control, name: `orders.${orderIndex}.items` }) ?? []
-  return <span className="cell__summary">{items.length}件の明細</span>
+  return <span className="text-sm text-text-muted">{items.length}件の明細</span>
 }
 
 /** RemoveItemButton の props */
@@ -72,13 +73,13 @@ type RemoveProps = CellProps & {
 export function RemoveItemButton({ control, orderIndex, itemIndex, getValues, setValue }: RemoveProps) {
   const count = (useWatch({ control, name: `orders.${orderIndex}.items` }) ?? []).length
   return (
-    <button
-      type="button"
-      className="btn btn--destructive btn--sm"
+    <Button
+      variant="destructive"
+      size="sm"
       disabled={count <= 1}
       onClick={() => removeItem(getValues, setValue, orderIndex, itemIndex)}
     >
       削除
-    </button>
+    </Button>
   )
 }

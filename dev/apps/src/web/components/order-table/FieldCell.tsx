@@ -1,6 +1,8 @@
 import type { OrderTableForm } from '@habit/zod'
 import { useState } from 'react'
 import { useController, type Control, type FieldPath } from 'react-hook-form'
+import { FieldError } from '../../ui/FieldError'
+import { Input } from '../../ui/Input'
 
 /** FieldCell の props */
 type Props = {
@@ -36,9 +38,9 @@ export function FieldCell({ control, name, type = 'text', label }: Props) {
   const [draft, setDraft] = useState<string | null>(null)
   const formValue = typeof field.value === 'number' && Number.isNaN(field.value) ? '' : String(field.value ?? '')
   return (
-    <div className="cell">
-      <input
-        className={error ? 'input input--error' : 'input'}
+    <div>
+      <Input
+        invalid={Boolean(error)}
         type={type}
         aria-label={label}
         aria-invalid={error ? true : undefined}
@@ -62,9 +64,7 @@ export function FieldCell({ control, name, type = 'text', label }: Props) {
         }}
       />
       {error && (
-        <p className="field__error" role="alert">
-          {error.message}
-        </p>
+        <FieldError>{error.message}</FieldError>
       )}
     </div>
   )
