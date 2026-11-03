@@ -5,4 +5,5 @@ export const rowVersionField = z
   .number({ error: 'バージョンは数値で指定してください' })
   .int('バージョンは整数で指定してください')
   .min(1, 'バージョンは1以上で指定してください')
+/** 行バージョンの型 */
 export type RowVersion = z.infer<typeof rowVersionField>

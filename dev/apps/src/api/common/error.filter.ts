@@ -2,13 +2,30 @@ import { Catch, HttpException, Logger, type ArgumentsHost, type ExceptionFilter 
 import type { ErrorResponse } from "@habit/zod";
 import { AppError } from "./app-error";
 
+/**
+ * すべての例外を、errorResponseSchema の形のJSON応答に変換するフィルタ。
+ */
 @Catch()
 export class ErrorFilter implements ExceptionFilter {
+  /** 想定外のエラーを記録するロガー */
   private readonly logger = new Logger(ErrorFilter.name);
 
+  /**
+   * 例外を応答に変換する。
+   *
+   * @param exception 投げられた例外
+   * @param host リクエスト・レスポンスを取り出すための実行コンテキスト
+   */
   catch(exception: unknown, host: ArgumentsHost) {
+    // ================================================================
+    // 1. 応答オブジェクトの取得
+    // ================================================================
     const res = host.switchToHttp().getResponse<{ status(n: number): { json(b: unknown): void } }>();
 
+    // ================================================================
+    // 2. 例外の種類ごとに応答を決める
+    //    業務エラー、Nest標準の例外、想定外のエラーの順に判定する
+    // ================================================================
     // 業務エラーは、持っているステータスとコードで返す
     if (exception instanceof AppError) {
       const body: ErrorResponse = { error: { code: exception.code, message: exception.message } };

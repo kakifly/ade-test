@@ -1,4 +1,5 @@
 // 文書生成用の最小限のMarkdown解析。基本設計書など、このリポジトリのMarkdownが使う記法だけを扱う。
+/** Markdownを解析した結果の1要素。type で種類を区別する。 */
 export type Block =
   | { type: 'heading'; level: number; text: string }
   | { type: 'paragraph'; text: string }
@@ -6,10 +7,18 @@ export type Block =
   | { type: 'code'; text: string }
   | { type: 'table'; header: string[]; rows: string[][] };
 
-// 強調記号とバッククォートを外し、表示用の文字にする
+/**
+ * 強調記号（**）とバッククォートを外し、表示用の文字にする。
+ * @param text Markdownのインライン記法を含む文字列
+ * @returns 記法を除いた、前後の空白なしの文字列
+ */
 const clean = (text: string): string => text.replace(/\*\*(.+?)\*\*/g, '$1').replace(/`/g, '').trim();
 
-// バッククォートの中の縦線では、列を分けない
+/**
+ * 表の1行を列に分ける。バッククォートの中の縦線では、列を分けない。
+ * @param line 縦線区切りの表の1行
+ * @returns 列ごとの文字列（記法は除去済み）
+ */
 function splitRow(line: string): string[] {
   const cells: string[] = [];
   let current = '';
@@ -27,7 +36,17 @@ function splitRow(line: string): string[] {
   return cells;
 }
 
+/**
+ * Markdownを、見出し・段落・箇条書き・コード・表のブロックの並びに変換する。
+ * 対応する記法は、このリポジトリの文書が使うものだけ。
+ * @param md Markdown全文
+ * @returns ブロックの配列（文書の出現順）
+ */
 export function parseMarkdown(md: string): Block[] {
+// ================================================================
+// 1. 行ごとの走査
+//    行を順に読み、コード・表・それ以外（見出し、箇条書き、引用、段落）に振り分ける
+// ================================================================
   const lines = md.split('\n');
   const blocks: Block[] = [];
   let i = 0;
@@ -52,6 +71,7 @@ export function parseMarkdown(md: string): Block[] {
       const [header, , ...body] = rows;
       blocks.push({ type: 'table', header: splitRow(header ?? ''), rows: body.map(splitRow) });
     } else {
+      // 1行で完結するブロック: 該当する記法の順に判定する（どれでもない空行は捨てる）
       if (heading) blocks.push({ type: 'heading', level: heading[1]!.length, text: clean(heading[2]!) });
       else if (bullet) blocks.push({ type: 'bullet', text: clean(bullet[1]!) });
       else if (ordered) blocks.push({ type: 'bullet', text: `${ordered[1]}. ${clean(ordered[2]!)}` });
@@ -61,5 +81,9 @@ export function parseMarkdown(md: string): Block[] {
       i++;
     }
   }
+
+// ================================================================
+// 2. ブロックの返却
+// ================================================================
   return blocks;
 }

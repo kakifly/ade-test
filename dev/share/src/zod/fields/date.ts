@@ -12,4 +12,5 @@ export const dateField = z
     },
     '実在する日付を指定してください',
   )
+/** 日付文字列の型 */
 export type DateString = z.infer<typeof dateField>

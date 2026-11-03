@@ -1,25 +1,50 @@
 // docs/ai-input/requirements.md を元に、顧客提出用の要件定義書（Word）を生成する。
 // 使い方: bun dev/scripts/src/generate-docs/build-requirements-docx.js [出力先]
+// 出力先を省略すると docs/deliverables/要件定義書.docx に書く。本文はこのファイルに直接書いてある。
 import fs from 'node:fs';
 import * as docx from 'docx';
 
+// ================================================================
+// 1. 部品の準備と共通の定数
+//    docx ライブラリの部品、フォント、ページ幅、罫線
+// ================================================================
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, HeadingLevel,
   AlignmentType, WidthType, ShadingType, BorderStyle, LevelFormat, Header, Footer,
   PageNumber, PageBreak, TableOfContents,
 } = docx;
 
+/** 文書のフォント */
 const FONT = 'Yu Gothic';
-const W = 9638; // A4 (11906) - 左右余白 1134*2
+/** 本文の幅（A4 の 11906 から左右余白 1134*2 を引いた値） */
+const W = 9638;
+/** 罫線1本分の定義 */
 const BORDER = { style: BorderStyle.SINGLE, size: 4, color: '999999' };
+/** 表のセルの四辺の罫線 */
 const BORDERS = { top: BORDER, bottom: BORDER, left: BORDER, right: BORDER };
 
+// ================================================================
+// 2. 文書の部品を作る関数
+//    文字、段落、見出し、箇条書き、表、空行
+// ================================================================
+/** フォント付きの文字（TextRun）を作る。 */
 const t = (text, o = {}) => new TextRun({ text, font: FONT, ...o });
+/** 本文の段落を作る。 */
 const p = (text, o = {}) => new Paragraph({ spacing: { after: 120, line: 320 }, children: [t(text)], ...o });
+/** 見出し1を作る。 */
 const h1 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_1, children: [t(text)] });
+/** 見出し2を作る。 */
 const h2 = (text) => new Paragraph({ heading: HeadingLevel.HEADING_2, children: [t(text)] });
+/** 箇条書きの1項目を作る。 */
 const bullet = (text) => new Paragraph({ numbering: { reference: 'bullets', level: 0 }, spacing: { after: 60, line: 320 }, children: [t(text)] });
 
+/**
+ * 見出し行付きの罫線表を作る。セルの改行（\n）は段落に分ける。
+ * @param widths 列ごとの幅（DXA）
+ * @param header 見出し行の各列の文字
+ * @param rows データ行（各行は列ごとの文字の配列）
+ * @returns 表（Table）
+ */
 function table(widths, header, rows) {
   const mk = (text, w, head) => new TableCell({
     width: { size: w, type: WidthType.DXA },
@@ -37,9 +62,13 @@ function table(widths, header, rows) {
     ],
   });
 }
+/** 表や節のあとに入れる空行を作る。 */
 const gap = () => new Paragraph({ spacing: { after: 120 }, children: [] });
 
-// ---- 表紙 ----
+// ================================================================
+// 3. 表紙
+//    タイトル、文書情報の表、改ページ
+// ================================================================
 const cover = [
   new Paragraph({ spacing: { before: 3200 }, children: [] }),
   new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 }, children: [t('要件定義書', { size: 56, bold: true })] }),
@@ -53,7 +82,10 @@ const cover = [
   new Paragraph({ children: [new PageBreak()] }),
 ];
 
-// ---- 改訂履歴 + 目次 ----
+// ================================================================
+// 4. 改訂履歴と目次
+//    文書を更新したら、ここに行を足す
+// ================================================================
 const front = [
   new Paragraph({ children: [t('改訂履歴', { size: 28, bold: true })], spacing: { after: 160 } }),
   table([1400, 1800, 6438], ['版', '日付', '内容'], [['1.0', '2026-11-01', '初版作成'], ['1.1', '2026-11-01', '同時実行制御（N-07）、更新の追跡（N-08）、行バージョン・トランザクションIDのデータ項目、UIデザイン、受入基準A-09〜A-11を追加']]),
@@ -63,7 +95,10 @@ const front = [
   new Paragraph({ children: [new PageBreak()] }),
 ];
 
-// ---- 本文 ----
+// ================================================================
+// 5. 本文
+//    1章から11章まで。各章の内容はそのまま顧客提出用の文書になる
+// ================================================================
 const body = [
   h1('1. はじめに'),
   h2('1.1 目的'),
@@ -214,6 +249,10 @@ const body = [
   ]),
 ];
 
+// ================================================================
+// 6. 文書の組み立て
+//    スタイル（見出し・箇条書き）、ページ設定、ヘッダー・フッターを定め、表紙・前付け・本文を並べる
+// ================================================================
 const doc = new Document({
   creator: '',
   title: '習慣チェックアプリ 要件定義書',
@@ -240,6 +279,10 @@ const doc = new Document({
   }],
 });
 
+// ================================================================
+// 7. ファイルへの書き出し
+//    出力先は第1引数。省略時は docs/deliverables/要件定義書.docx
+// ================================================================
 const buf = await Packer.toBuffer(doc);
 {
   const out = process.argv[2] ?? 'docs/deliverables/要件定義書.docx';

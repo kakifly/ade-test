@@ -1,2 +1,2 @@
-// DBクライアントの注入トークン
+/** DBクライアントの注入トークン */
 export const DB = Symbol("DB");

@@ -3,6 +3,7 @@
 import { spawnSync } from 'node:child_process';
 import type { SchemaInfo } from './table-spec-workbook.ts';
 
+/** テーブル・列・主キー・外部キー・一意制約・トリガを1つのJSONとして返すSQL。public スキーマの通常テーブルだけが対象。 */
 const QUERY = `
 SELECT json_build_object(
   'dbName', current_database(),
@@ -35,9 +36,22 @@ SELECT json_build_object(
   ), '[]'::json)
 );`;
 
+/**
+ * psql でDBのカタログを読み、テーブル定義を返す。読み取り専用で、DBは変更しない。
+ * @param url 接続文字列。psql の引数にだけ渡し、出力やエラーには出さない
+ * @returns DB名とテーブル定義の一覧
+ * @throws psql の実行に失敗したとき（原因の詳細は接続情報を含みうるので載せない）
+ */
 export function readSchema(url: string): SchemaInfo {
+// ================================================================
+// 1. カタログ照会の実行
+// ================================================================
   const r = spawnSync('psql', [url, '-At', '-v', 'ON_ERROR_STOP=1', '-c', QUERY], { encoding: 'utf8' });
   // 失敗時はpsqlの出力を載せず、固定のメッセージだけにする（接続情報の漏えい防止）
   if (r.status !== 0) throw new Error('DBの読み取りに失敗しました（接続先と権限を確認してください）');
+
+// ================================================================
+// 2. 出力のJSONを定義として返す
+// ================================================================
   return JSON.parse(r.stdout) as SchemaInfo;
 }

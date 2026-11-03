@@ -6,4 +6,5 @@ export const habitNameField = z
   .trim()
   .min(1, '習慣名を入力してください')
   .max(50, '習慣名は50文字以内で入力してください')
+/** 習慣名の型 */
 export type HabitName = z.infer<typeof habitNameField>
